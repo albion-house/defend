@@ -1,6 +1,6 @@
 # Toolchain Policy
 
-Killbox uses mise as the local source of truth for project tools and task entry points. Project tools should track the latest stable or LTS-compatible line where practical, while generated lockfiles keep actual installs reproducible.
+Defend uses mise as the local source of truth for project tools and task entry points. Project tools should track the latest stable or LTS-compatible line where practical, while generated lockfiles keep actual installs reproducible.
 
 ## Local Tools
 

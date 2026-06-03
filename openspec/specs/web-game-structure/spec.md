@@ -1,7 +1,7 @@
 # web-game-structure Specification
 
 ## Purpose
-Define the TypeScript, Vite, and Phaser browser project structure used by the active Killbox prototype.
+Define the TypeScript, Vite, and Phaser browser project structure used by the active Defend prototype.
 
 ## Requirements
 ### Requirement: Browser-playable static prototype
@@ -34,7 +34,7 @@ The system SHALL publish every successful production build from `main` to GitHub
 #### Scenario: Main branch deployment
 - **GIVEN** a change has been pushed to `origin/main`
 - **WHEN** the GitHub Actions deployment workflow completes successfully
-- **THEN** the public GitHub Pages URL SHALL serve the built Killbox client for that change
+- **THEN** the public GitHub Pages URL SHALL serve the built Defend client for that change
 
 ### Requirement: Visible deployed version identifier
 The browser client SHALL display a deployment version identifier that automation can read from the public page.

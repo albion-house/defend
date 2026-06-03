@@ -1,11 +1,11 @@
 # living-design-system Specification
 
 ## Purpose
-Define the living design-system behavior for Killbox visual tokens, component documentation, rendering previews, and gameplay readability validation.
+Define the living design-system behavior for Defend visual tokens, component documentation, rendering previews, and gameplay readability validation.
 
 ## Requirements
 ### Requirement: Design tokens
-The site SHALL document visual tokens used by the Killbox platform and prototype UI.
+The site SHALL document visual tokens used by the Defend platform and prototype UI.
 
 #### Scenario: Visitor opens design system route
 - **WHEN** a visitor opens the design system route
@@ -37,7 +37,7 @@ The site SHALL collapse primary navigation links behind a hamburger menu on mobi
 
 #### Scenario: Visitor opens mobile site
 - **WHEN** a visitor opens the site in a mobile-width viewport
-- **THEN** the header SHALL show the Killbox brand and a hamburger navigation control instead of rendering all primary links inline
+- **THEN** the header SHALL show the Defend brand and a hamburger navigation control instead of rendering all primary links inline
 
 #### Scenario: Visitor opens desktop site
 - **WHEN** a visitor opens the site in a desktop-width viewport

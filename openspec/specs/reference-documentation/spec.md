@@ -1,25 +1,25 @@
 # reference-documentation Specification
 
 ## Purpose
-Define markdown reference documentation and glossary behavior for shared Killbox terminology and concepts.
+Define markdown reference documentation and glossary behavior for shared Defend terminology and concepts.
 
 ## Requirements
 ### Requirement: Markdown reference documentation
-The repository SHALL contain markdown-based reference documentation for shared Killbox terminology and concepts.
+The repository SHALL contain markdown-based reference documentation for shared Defend terminology and concepts.
 
 #### Scenario: Reference docs exist
 - **WHEN** a developer looks for project reference documentation in the repository
 - **THEN** they SHALL be able to find markdown documentation that can be read without running the game or a documentation site
 
 ### Requirement: Canonical glossary
-The reference documentation SHALL include a glossary that defines reusable game and development terms in one canonical place, preferring established industry or genre terminology when that terminology accurately describes Killbox behavior.
+The reference documentation SHALL include a glossary that defines reusable game and development terms in one canonical place, preferring established industry or genre terminology when that terminology accurately describes Defend behavior.
 
 #### Scenario: Glossary defines shared terms
-- **WHEN** a term is used across specs, implementation, or player-facing copy as Killbox domain vocabulary
+- **WHEN** a term is used across specs, implementation, or player-facing copy as Defend domain vocabulary
 - **THEN** the glossary SHALL provide a concise definition for that term
 
 #### Scenario: Glossary uses established terminology when accurate
-- **WHEN** a glossary term has an established industry or genre meaning that accurately fits Killbox behavior
+- **WHEN** a glossary term has an established industry or genre meaning that accurately fits Defend behavior
 - **THEN** the glossary SHALL use that established term instead of inventing a one-off synonym
 
 #### Scenario: Glossary defines exit

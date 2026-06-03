@@ -3,7 +3,7 @@ import { getMissionContent } from "./state";
 import type { GameCommand, GameState, GameStateSnapshot } from "./state";
 import { getSerializableSnapshot } from "./state";
 
-export interface KillboxDebugState {
+export interface DefendDebugState {
   deploymentVersion: string;
   scene: GameState["scene"];
   sessionId: string;
@@ -76,22 +76,22 @@ export interface KillboxDebugState {
   controls: string[];
 }
 
-export interface KillboxDebugApi {
+export interface DefendDebugApi {
   getState(): GameStateSnapshot;
-  describe(): KillboxDebugState;
+  describe(): DefendDebugState;
   dispatch(command: GameCommand): GameStateSnapshot;
 }
 
 declare global {
   interface Window {
-    __KILLBOX_DEBUG__?: KillboxDebugApi;
+    __DEFEND_DEBUG__?: DefendDebugApi;
   }
 }
 
 export function describeGameState(
   state: GameState,
   deploymentVersion = getDeploymentVersion()
-): KillboxDebugState {
+): DefendDebugState {
   const content = getMissionContent();
   return {
     deploymentVersion,
@@ -168,8 +168,8 @@ export function installDebugApi(
   getState: () => GameState,
   dispatch: (command: GameCommand) => GameState,
   deploymentVersion = getDeploymentVersion()
-): KillboxDebugApi {
-  const api: KillboxDebugApi = {
+): DefendDebugApi {
+  const api: DefendDebugApi = {
     getState: () => getSerializableSnapshot(getState()),
     describe: () => describeGameState(getState(), deploymentVersion),
     dispatch: (command) => {
@@ -180,14 +180,14 @@ export function installDebugApi(
   };
 
   if (typeof window !== "undefined") {
-    window.__KILLBOX_DEBUG__ = api;
+    window.__DEFEND_DEBUG__ = api;
     syncDebugDom(api.describe());
   }
 
   return api;
 }
 
-export function syncDebugDom(debugState: KillboxDebugState): void {
+export function syncDebugDom(debugState: DefendDebugState): void {
   if (typeof document === "undefined") {
     return;
   }
@@ -197,20 +197,20 @@ export function syncDebugDom(debugState: KillboxDebugState): void {
   const semanticState = document.querySelector<HTMLElement>("#semantic-state");
 
   if (app) {
-    app.dataset.killboxVersion = debugState.deploymentVersion;
-    app.dataset.killboxScene = debugState.scene;
-    app.dataset.killboxSession = debugState.sessionId;
-    app.dataset.killboxPlayers = String(debugState.activePlayers);
-    app.dataset.killboxMission = debugState.mission.status;
-    app.dataset.killboxWave = debugState.wave.active ? "active" : "idle";
-    app.dataset.killboxEnemies = String(debugState.activeEnemyCount);
-    app.dataset.killboxTowers = String(debugState.towers.length);
-    app.dataset.killboxObjectiveHp = debugState.objectiveHp;
+    app.dataset.defendVersion = debugState.deploymentVersion;
+    app.dataset.defendScene = debugState.scene;
+    app.dataset.defendSession = debugState.sessionId;
+    app.dataset.defendPlayers = String(debugState.activePlayers);
+    app.dataset.defendMission = debugState.mission.status;
+    app.dataset.defendWave = debugState.wave.active ? "active" : "idle";
+    app.dataset.defendEnemies = String(debugState.activeEnemyCount);
+    app.dataset.defendTowers = String(debugState.towers.length);
+    app.dataset.defendObjectiveHp = debugState.objectiveHp;
   }
 
   if (deploymentVersion) {
     deploymentVersion.textContent = `Version ${debugState.deploymentVersion}`;
-    deploymentVersion.dataset.killboxVersion = debugState.deploymentVersion;
+    deploymentVersion.dataset.defendVersion = debugState.deploymentVersion;
   }
 
   if (semanticState) {
@@ -229,7 +229,7 @@ export function syncDebugDom(debugState: KillboxDebugState): void {
   }
 }
 
-function formatWaveState(debugState: KillboxDebugState): string {
+function formatWaveState(debugState: DefendDebugState): string {
   if (debugState.mission.status === "victory" || debugState.mission.status === "defeat") {
     return debugState.mission.status;
   }

@@ -1,11 +1,11 @@
 # astro-game-platform Specification
 
 ## Purpose
-Define the Astro static site shell, canonical platform routes, Phaser embed behavior, and deployment-version continuity for the public Killbox browser experience.
+Define the Astro static site shell, canonical platform routes, Phaser embed behavior, and deployment-version continuity for the public Defend browser experience.
 
 ## Requirements
 ### Requirement: Astro static site shell
-The system SHALL use Astro as the static site shell for the public Killbox browser experience.
+The system SHALL use Astro as the static site shell for the public Defend browser experience.
 
 #### Scenario: Developer builds the site
 - **WHEN** a developer runs the production build command
@@ -13,7 +13,7 @@ The system SHALL use Astro as the static site shell for the public Killbox brows
 
 #### Scenario: Visitor opens the home route
 - **WHEN** a visitor opens the built site home route
-- **THEN** the page SHALL present Killbox as a playable game platform with navigation to the playable build, theme galleries, design system, rendering sandbox, asset catalog, and gameplay documentation
+- **THEN** the page SHALL present Defend as a playable game platform with navigation to the playable build, theme galleries, design system, rendering sandbox, asset catalog, and gameplay documentation
 
 ### Requirement: Embedded Phaser play surface
 The Astro site SHALL embed the Phaser runtime as one client-side interactive surface without making the whole site a Phaser application.

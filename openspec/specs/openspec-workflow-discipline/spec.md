@@ -1,7 +1,7 @@
 # openspec-workflow-discipline Specification
 
 ## Purpose
-Define the enforced OpenSpec workflow cycle, stage commits, clean git state expectations, and apply-time UI inspection loop for Killbox platform changes.
+Define the enforced OpenSpec workflow cycle, stage commits, clean git state expectations, and apply-time UI inspection loop for Defend platform changes.
 
 ## Requirements
 ### Requirement: Required OpenSpec stage order

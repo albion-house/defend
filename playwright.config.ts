@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import { createServer } from "node:net";
 
-const publicBaseURL = process.env.KILLBOX_PUBLIC_BASE_URL?.trim();
+const publicBaseURL = process.env.DEFEND_PUBLIC_BASE_URL?.trim();
 const explicitLocalBaseURL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const localPreview = publicBaseURL || explicitLocalBaseURL ? undefined : await createLocalPreview();
 const baseURL = publicBaseURL || explicitLocalBaseURL || localPreview?.baseURL;
@@ -45,14 +45,14 @@ async function createLocalPreview(): Promise<{ baseURL: string; command: string 
 }
 
 async function getPreviewPort(): Promise<number> {
-  const existingPort = Number.parseInt(process.env.KILLBOX_PLAYWRIGHT_PREVIEW_PORT ?? "", 10);
+  const existingPort = Number.parseInt(process.env.DEFEND_PLAYWRIGHT_PREVIEW_PORT ?? "", 10);
 
   if (Number.isInteger(existingPort) && existingPort > 0) {
     return existingPort;
   }
 
   const port = await findAvailableLoopbackPort();
-  process.env.KILLBOX_PLAYWRIGHT_PREVIEW_PORT = String(port);
+  process.env.DEFEND_PLAYWRIGHT_PREVIEW_PORT = String(port);
   return port;
 }
 

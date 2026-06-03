@@ -6,5 +6,5 @@ export function normalizeDeploymentVersion(value: string | undefined): string {
 }
 
 export function getDeploymentVersion(): string {
-  return normalizeDeploymentVersion(import.meta.env.VITE_KILLBOX_DEPLOY_VERSION);
+  return normalizeDeploymentVersion(import.meta.env.VITE_DEFEND_DEPLOY_VERSION);
 }

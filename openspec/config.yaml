@@ -1,7 +1,7 @@
 schema: spec-driven
 
 context: |
-  Killbox is a browser-playable cooperative action tower-defense prototype.
+  Defend is a browser-playable cooperative action tower-defense prototype.
   The active implementation is TypeScript, Vite, and Phaser.
 
   Current prototype direction:
@@ -13,7 +13,7 @@ context: |
   Important source areas:
   - src/main.ts boots Phaser, installs the debug API, and wires local mock transport.
   - src/game/state.ts owns serializable game state and command application.
-  - src/game/debug.ts exposes window.__KILLBOX_DEBUG__ for browser automation.
+  - src/game/debug.ts exposes window.__DEFEND_DEBUG__ for browser automation.
   - src/net/transport.ts defines the transport abstraction and mock transport.
   - src/scenes/PrototypeScene.ts renders the current prototype scene.
   - tests/ covers state, debug API, and transport behavior.

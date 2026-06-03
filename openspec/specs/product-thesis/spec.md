@@ -1,10 +1,10 @@
 # product-thesis Specification
 
 ## Purpose
-Define the product identity and prototype-first constraints for Killbox.
+Define the product identity and prototype-first constraints for Defend.
 ## Requirements
 ### Requirement: Cooperative action tower-defense identity
-Killbox SHALL combine active hero combat, fixed-pad tower defense, shared team economy, scripted enemy waves, and browser-accessible cooperative play.
+Defend SHALL combine active hero combat, fixed-pad tower defense, shared team economy, scripted enemy waves, and browser-accessible cooperative play.
 
 #### Scenario: Two players defend one objective
 - **GIVEN** two players are in the prototype map through local simulation or a remote session

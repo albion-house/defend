@@ -63,9 +63,9 @@ The repository SHALL provide a check command that validates TypeScript, tests, s
 Public deployment verification SHALL preserve the configured GitHub Pages repository base path when checking platform routes.
 
 #### Scenario: Verify repository Pages routes
-- **GIVEN** the public base URL is `https://codekiln.github.io/killbox/`
+- **GIVEN** the public base URL is `https://codekiln.github.io/defend/`
 - **WHEN** browser verification checks platform subroutes
-- **THEN** it SHALL check routes below `/killbox/` rather than the domain root
+- **THEN** it SHALL check routes below `/defend/` rather than the domain root
 
 ### Requirement: Public deployment wait honors test timeout
 Public deployment verification SHALL allow its configured deployment readiness wait to complete before Playwright's per-test timeout fails the test.

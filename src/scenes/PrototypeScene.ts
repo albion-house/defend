@@ -97,13 +97,13 @@ export class PrototypeScene extends Phaser.Scene {
     this.scaleResizeHandler = () => this.renderState();
     this.stateChangeHandler = () => this.renderState();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.scaleResizeHandler);
-    window.addEventListener("killbox:state-change", this.stateChangeHandler);
+    window.addEventListener("defend:state-change", this.stateChangeHandler);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       if (this.scaleResizeHandler) {
         this.scale.off(Phaser.Scale.Events.RESIZE, this.scaleResizeHandler);
       }
       if (this.stateChangeHandler) {
-        window.removeEventListener("killbox:state-change", this.stateChangeHandler);
+        window.removeEventListener("defend:state-change", this.stateChangeHandler);
       }
     });
   }

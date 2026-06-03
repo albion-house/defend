@@ -1,7 +1,7 @@
 # themeable-game-system Specification
 
 ## Purpose
-Define theme manifests and preview behavior for interchangeable Killbox biomes, factions, enemy themes, tilesets, FX, UI, audio, gameplay modifiers, and future procedural expansion metadata.
+Define theme manifests and preview behavior for interchangeable Defend biomes, factions, enemy themes, tilesets, FX, UI, audio, gameplay modifiers, and future procedural expansion metadata.
 
 ## Requirements
 ### Requirement: Theme manifests

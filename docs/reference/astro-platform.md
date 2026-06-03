@@ -1,6 +1,6 @@
 # Astro Platform
 
-Killbox uses Astro as the canonical static site shell and Phaser as an embedded client-side runtime surface. The site is the public interface for playable builds, theme previews, faction previews, asset metadata, design tokens, rendering experiments, gameplay documentation, and runtime validation.
+Defend uses Astro as the canonical static site shell and Phaser as an embedded client-side runtime surface. The site is the public interface for playable builds, theme previews, faction previews, asset metadata, design tokens, rendering experiments, gameplay documentation, and runtime validation.
 
 ## Boundaries
 

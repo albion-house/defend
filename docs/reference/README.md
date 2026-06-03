@@ -1,6 +1,6 @@
-# Killbox Reference
+# Defend Reference
 
-This folder contains markdown reference documentation for shared Killbox terminology and concepts. It is intentionally plain markdown so it can be read directly in the repository today and later folded into a richer reference site if that becomes useful.
+This folder contains markdown reference documentation for shared Defend terminology and concepts. It is intentionally plain markdown so it can be read directly in the repository today and later folded into a richer reference site if that becomes useful.
 
 Start with the [glossary](./glossary.md) for canonical definitions of recurring game and development terms. Use the [Astro platform notes](./astro-platform.md) for site architecture, the Phaser embed boundary, theme and asset metadata, deployment, and OpenSpec workflow discipline. Use the [toolchain policy](./toolchain.md) for mise, Aube, Node, and GitHub Actions expectations.
 

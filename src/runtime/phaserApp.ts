@@ -6,30 +6,30 @@ import type { GameCommand, GameState } from "../game/state";
 import { MockSessionTransport } from "../net/transport";
 import { PrototypeScene, prototypeSceneSize } from "../scenes/PrototypeScene";
 
-export interface KillboxRuntime {
+export interface DefendRuntime {
   readonly game: Phaser.Game;
   getState(): GameState;
   dispatch(command: GameCommand): GameState;
   destroy(): void;
 }
 
-export interface MountKillboxGameOptions {
+export interface MountDefendGameOptions {
   parent: string | HTMLElement;
   deploymentVersion?: string;
   sessionId?: string;
 }
 
-export function mountKillboxGame({
+export function mountDefendGame({
   parent,
   deploymentVersion = getDeploymentVersion(),
   sessionId = "local-mock"
-}: MountKillboxGameOptions): KillboxRuntime {
+}: MountDefendGameOptions): DefendRuntime {
   let gameState: GameState = createInitialGameState(sessionId);
   const transport = new MockSessionTransport(gameState.sessionId);
 
   function dispatch(command: GameCommand): GameState {
     gameState = applyGameCommand(gameState, command);
-    window.dispatchEvent(new CustomEvent("killbox:state-change", { detail: command }));
+    window.dispatchEvent(new CustomEvent("defend:state-change", { detail: command }));
     if (command.type !== "simulation:step" && command.type !== "simulation:tick") {
       void transport.send({
         sessionId: gameState.sessionId,

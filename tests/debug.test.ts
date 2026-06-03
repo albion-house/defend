@@ -62,7 +62,7 @@ describe("debug observability", () => {
   });
 
   it("installs an agent-facing debug API and syncs version DOM state when window exists", () => {
-    const fakeWindow: { __KILLBOX_DEBUG__?: unknown } = {};
+    const fakeWindow: { __DEFEND_DEBUG__?: unknown } = {};
     const fakeApp: { dataset: Record<string, string> } = { dataset: {} };
     const fakeVersion: { dataset: Record<string, string>; textContent: string } = {
       dataset: {},
@@ -97,14 +97,14 @@ describe("debug observability", () => {
     api.dispatch({ type: "wave:start" });
     api.dispatch({ type: "simulation:step", ticks: 16 });
 
-    expect(fakeWindow.__KILLBOX_DEBUG__).toBe(api);
+    expect(fakeWindow.__DEFEND_DEBUG__).toBe(api);
     expect(api.getState().buildPads[1].occupiedBy).toBe("tower-1-ranger-post");
     expect(api.getState().enemies).toHaveLength(4);
     expect(api.describe().deploymentVersion).toBe("0.1.0+domtest");
-    expect(fakeApp.dataset.killboxVersion).toBe("0.1.0+domtest");
-    expect(fakeApp.dataset.killboxEnemies).toBe("4");
-    expect(fakeApp.dataset.killboxTowers).toBe("1");
-    expect(fakeVersion.dataset.killboxVersion).toBe("0.1.0+domtest");
+    expect(fakeApp.dataset.defendVersion).toBe("0.1.0+domtest");
+    expect(fakeApp.dataset.defendEnemies).toBe("4");
+    expect(fakeApp.dataset.defendTowers).toBe("1");
+    expect(fakeVersion.dataset.defendVersion).toBe("0.1.0+domtest");
     expect(fakeVersion.textContent).toBe("Version 0.1.0+domtest");
     expect(fakeSemanticState.textContent).toContain("Version: 0.1.0+domtest");
     expect(fakeSemanticState.textContent).toContain("Towers: 1");

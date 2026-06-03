@@ -1,15 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
-import type { KillboxDebugState } from "../../src/game/debug";
+import type { DefendDebugState } from "../../src/game/debug";
 
-const expectedVersion = process.env.KILLBOX_EXPECTED_VERSION?.trim();
-const deploymentWaitMs = readPositiveInt("KILLBOX_DEPLOYMENT_WAIT_MS", expectedVersion ? 120_000 : 15_000);
-const deploymentPollMs = readPositiveInt("KILLBOX_DEPLOYMENT_POLL_MS", 5_000);
+const expectedVersion = process.env.DEFEND_EXPECTED_VERSION?.trim();
+const deploymentWaitMs = readPositiveInt("DEFEND_DEPLOYMENT_WAIT_MS", expectedVersion ? 120_000 : 15_000);
+const deploymentPollMs = readPositiveInt("DEFEND_DEPLOYMENT_POLL_MS", 5_000);
 
 test.setTimeout(deploymentWaitMs + 60_000);
 
 test("initial game is playable", async ({ page, baseURL }) => {
   if (!baseURL) {
-    throw new Error("Playwright baseURL is required for Killbox e2e verification.");
+    throw new Error("Playwright baseURL is required for Defend e2e verification.");
   }
 
   await openReadyDeployment(page, resolveRouteURL(baseURL, "/play/"));
@@ -28,16 +28,16 @@ test("initial game is playable", async ({ page, baseURL }) => {
   await expect(page.locator("#semantic-state")).toContainText("Mission: Saltmarsh Crossing");
   await expect(page.locator("#semantic-state")).not.toBeVisible();
 
-  const playerState = await page.evaluate(() => window.__KILLBOX_DEBUG__?.getState().players);
+  const playerState = await page.evaluate(() => window.__DEFEND_DEBUG__?.getState().players);
   expect(playerState).toEqual([
     expect.objectContaining({ id: "p1", connected: true }),
     expect.objectContaining({ id: "p2", connected: false })
   ]);
 
   const commandResult = await page.evaluate(() => {
-    const debug = window.__KILLBOX_DEBUG__;
+    const debug = window.__DEFEND_DEBUG__;
     if (!debug) {
-      throw new Error("Killbox debug API is not installed.");
+      throw new Error("Defend debug API is not installed.");
     }
 
     const padId = debug.describe().buildPads[0]?.id;
@@ -74,11 +74,11 @@ test("initial game is playable", async ({ page, baseURL }) => {
 
 test("Astro platform routes render canonical surfaces", async ({ page, baseURL }) => {
   if (!baseURL) {
-    throw new Error("Playwright baseURL is required for Killbox route verification.");
+    throw new Error("Playwright baseURL is required for Defend route verification.");
   }
 
   await page.goto(baseURL, { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("heading", { name: "Killbox" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Defend" })).toBeVisible();
   await expect(page.getByRole("navigation").getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await expect(page.locator("#game-root canvas")).toBeVisible();
 
@@ -106,7 +106,7 @@ async function openReadyDeployment(page: Page, baseURL: string): Promise<void> {
   while (Date.now() <= deadline) {
     try {
       await page.goto(withCacheBust(baseURL), { waitUntil: "domcontentloaded" });
-      await page.waitForFunction(() => Boolean(window.__KILLBOX_DEBUG__), null, {
+      await page.waitForFunction(() => Boolean(window.__DEFEND_DEBUG__), null, {
         timeout: Math.min(deploymentPollMs, 10_000)
       });
 
@@ -115,9 +115,9 @@ async function openReadyDeployment(page: Page, baseURL: string): Promise<void> {
       }
 
       const versionState = await page.evaluate(() => ({
-        appVersion: document.querySelector<HTMLElement>("#app")?.dataset.killboxVersion,
-        visibleVersion: document.querySelector<HTMLElement>("#deployment-version")?.dataset.killboxVersion,
-        debugVersion: window.__KILLBOX_DEBUG__?.describe().deploymentVersion
+        appVersion: document.querySelector<HTMLElement>("#app")?.dataset.defendVersion,
+        visibleVersion: document.querySelector<HTMLElement>("#deployment-version")?.dataset.defendVersion,
+        debugVersion: window.__DEFEND_DEBUG__?.describe().deploymentVersion
       }));
 
       if (
@@ -149,11 +149,11 @@ async function openReadyDeployment(page: Page, baseURL: string): Promise<void> {
   );
 }
 
-async function readDebugState(page: Page): Promise<KillboxDebugState> {
+async function readDebugState(page: Page): Promise<DefendDebugState> {
   return page.evaluate(() => {
-    const debug = window.__KILLBOX_DEBUG__;
+    const debug = window.__DEFEND_DEBUG__;
     if (!debug) {
-      throw new Error("Killbox debug API is not installed.");
+      throw new Error("Defend debug API is not installed.");
     }
     return debug.describe();
   });
@@ -161,7 +161,7 @@ async function readDebugState(page: Page): Promise<KillboxDebugState> {
 
 function withCacheBust(rawURL: string): string {
   const url = new URL(rawURL);
-  url.searchParams.set("killbox_verify", `${Date.now()}`);
+  url.searchParams.set("defend_verify", `${Date.now()}`);
   return url.toString();
 }
 

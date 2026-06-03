@@ -1,6 +1,6 @@
-# Killbox
+# Defend
 
-Killbox is a browser-playable tower-defense prototype and Astro-based game platform. The current build is a legally distinct, single-player first playable made with TypeScript, Astro, and Phaser, with a deterministic simulation core shaped for future remote co-op experiments.
+Defend is a browser-playable tower-defense prototype and Astro-based game platform. The current build is a legally distinct, single-player first playable made with TypeScript, Astro, and Phaser, with a deterministic simulation core shaped for future remote co-op experiments.
 
 A pre-pivot checkpoint is preserved by git tag:
 
@@ -61,7 +61,7 @@ GitHub Actions installs the mise-managed toolchain, uses Aube for deterministic 
 
 ## Reference Docs
 
-Shared Killbox terminology lives in the markdown reference docs at [docs/reference](docs/reference/README.md). Use the [glossary](docs/reference/glossary.md) for canonical definitions of recurring game and development terms, and the [toolchain policy](docs/reference/toolchain.md) for mise, Aube, Node, and GitHub Actions expectations.
+Shared Defend terminology lives in the markdown reference docs at [docs/reference](docs/reference/README.md). Use the [glossary](docs/reference/glossary.md) for canonical definitions of recurring game and development terms, and the [toolchain policy](docs/reference/toolchain.md) for mise, Aube, Node, and GitHub Actions expectations.
 
 The current architecture keeps Astro presentation, deterministic simulation, and Phaser rendering separated:
 
@@ -97,7 +97,7 @@ Commit immediately after each stage transition with a clear conventional commit 
 The playable route exposes semantic state for tests and coding agents through:
 
 ```ts
-window.__KILLBOX_DEBUG__
+window.__DEFEND_DEBUG__
 ```
 
 The debug API can describe the current mission, active players, objective HP, shared gold, wave state, tower and enemy entities, content counts, build-pad occupancy, outcome state, and supported commands. The app also mirrors coarse state onto `#app` data attributes and `#semantic-state` text for browser-level inspection.

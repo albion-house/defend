@@ -42,7 +42,7 @@ jobs:
         run: aube run build
         env:
           GITHUB_PAGES: "true"
-          VITE_KILLBOX_DEPLOY_VERSION: ${{ steps.version.outputs.deployment_version }}
+          VITE_DEFEND_DEPLOY_VERSION: ${{ steps.version.outputs.deployment_version }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
@@ -86,6 +86,6 @@ jobs:
       - name: Verify public Pages deployment
         run: aube run test:e2e:public
         env:
-          KILLBOX_PUBLIC_BASE_URL: ${{ needs.deploy.outputs.page_url }}
-          KILLBOX_EXPECTED_VERSION: ${{ needs.build.outputs.deployment_version }}
-          KILLBOX_DEPLOYMENT_WAIT_MS: "180000"
+          DEFEND_PUBLIC_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          DEFEND_EXPECTED_VERSION: ${{ needs.build.outputs.deployment_version }}
+          DEFEND_DEPLOYMENT_WAIT_MS: "180000"

@@ -4,23 +4,23 @@ import { getDeploymentVersion } from "../deployment";
 const deploymentVersion = getDeploymentVersion();
 ---
 
-<div id="app" data-killbox-version={deploymentVersion}>
-  <div id="game-shell" aria-label="Playable Killbox prototype">
-    <div id="game-root" data-killbox-deployment-version={deploymentVersion}></div>
-    <p id="deployment-version" data-killbox-version={deploymentVersion}>Version {deploymentVersion}</p>
+<div id="app" data-defend-version={deploymentVersion}>
+  <div id="game-shell" aria-label="Playable Defend prototype">
+    <div id="game-root" data-defend-deployment-version={deploymentVersion}></div>
+    <p id="deployment-version" data-defend-version={deploymentVersion}>Version {deploymentVersion}</p>
     <output id="semantic-state" aria-live="polite">Loading mission state...</output>
   </div>
 </div>
 
 <script>
-  import { mountKillboxGame } from "../runtime/phaserApp";
+  import { mountDefendGame } from "../runtime/phaserApp";
 
   const root = document.querySelector<HTMLElement>("#game-root");
-  if (root && root.dataset.killboxMounted !== "true") {
-    root.dataset.killboxMounted = "true";
-    const runtime = mountKillboxGame({
+  if (root && root.dataset.defendMounted !== "true") {
+    root.dataset.defendMounted = "true";
+    const runtime = mountDefendGame({
       parent: root,
-      deploymentVersion: root.dataset.killboxDeploymentVersion
+      deploymentVersion: root.dataset.defendDeploymentVersion
     });
     window.addEventListener("beforeunload", () => runtime.destroy(), { once: true });
   }
