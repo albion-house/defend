@@ -1,0 +1,10 @@
+.defend-game-host {
+  width: 100%;
+  height: 100%;
+}
+
+.defend-game-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

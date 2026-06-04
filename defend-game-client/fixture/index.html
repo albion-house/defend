@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="standalone defend game client fixture" />
+    <title>defend game client fixture</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background: #121418;
+      }
+
+      #game-root {
+        width: min(100vw, 1280px);
+        height: min(100vh, 720px);
+      }
+    </style>
+  </head>
+  <body>
+    <main id="game-root" aria-label="standalone defend game client"></main>
+    <script type="module" src="/fixture.ts"></script>
+  </body>
+</html>

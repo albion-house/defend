@@ -1,0 +1,64 @@
+---
+import { getDeploymentVersion } from "../deployment";
+import "@albion-house/defend-game-client/styles.css";
+
+const deploymentVersion = getDeploymentVersion();
+---
+
+<div id="app" data-defend-version={deploymentVersion}>
+  <div id="game-shell" aria-label="Playable Defend prototype">
+    <div id="game-root" data-defend-deployment-version={deploymentVersion}></div>
+    <p id="deployment-version" data-defend-version={deploymentVersion}>Version {deploymentVersion}</p>
+    <output id="semantic-state" aria-live="polite">Loading mission state...</output>
+  </div>
+</div>
+
+<script>
+  import { mountDefendGame, type DefendDebugState } from "@albion-house/defend-game-client";
+
+  const root = document.querySelector<HTMLElement>("#game-root");
+  if (root && root.dataset.defendMounted !== "true") {
+    root.dataset.defendMounted = "true";
+    const runtime = mountDefendGame({
+      parent: root,
+      deploymentVersion: root.dataset.defendDeploymentVersion,
+      onStateChange: syncHostState
+    });
+    window.addEventListener("beforeunload", () => runtime.destroy(), { once: true });
+  }
+
+  function syncHostState(state: DefendDebugState): void {
+    const app = root?.closest<HTMLElement>("#app");
+    const version = app?.querySelector<HTMLElement>("#deployment-version");
+    const semantic = app?.querySelector<HTMLElement>("#semantic-state");
+
+    if (app) {
+      app.dataset.defendVersion = state.deploymentVersion;
+      app.dataset.defendScene = state.scene;
+      app.dataset.defendSession = state.sessionId;
+      app.dataset.defendPlayers = String(state.activePlayers);
+      app.dataset.defendMission = state.mission.status;
+      app.dataset.defendWave = state.wave.active ? "active" : "idle";
+      app.dataset.defendEnemies = String(state.activeEnemyCount);
+      app.dataset.defendTowers = String(state.towers.length);
+      app.dataset.defendObjectiveHp = state.objectiveHp;
+    }
+    if (version) {
+      version.textContent = `version ${state.deploymentVersion}`;
+      version.dataset.defendVersion = state.deploymentVersion;
+    }
+    if (semantic) {
+      const occupied = state.buildPads.filter((pad) => pad.occupied).length;
+      semantic.textContent = [
+        `version: ${state.deploymentVersion}`,
+        `mission: ${state.mission.title} (${state.mission.status})`,
+        `players: ${state.activePlayers}/2`,
+        `objective: ${state.objectiveHp}`,
+        `gold: ${state.sharedGold}`,
+        `enemies: ${state.activeEnemyCount} active, ${state.wave.enemiesLeaked} leaked`,
+        `towers: ${state.towers.length}`,
+        `build pads: ${occupied}/${state.buildPads.length}`
+      ].join("\n");
+    }
+  }
+</script>

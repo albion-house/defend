@@ -9,7 +9,7 @@ The system SHALL use Astro as the static site shell for the public Defend browse
 
 #### Scenario: Developer builds the site
 - **WHEN** a developer runs the production build command
-- **THEN** Astro SHALL generate static site assets under `dist/`
+- **THEN** Astro SHALL generate static site assets under `web/dist/`
 
 #### Scenario: Visitor opens the home route
 - **WHEN** a visitor opens the built site home route

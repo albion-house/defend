@@ -2,7 +2,7 @@ schema: spec-driven
 
 context: |
   Defend is a browser-playable cooperative action tower-defense prototype.
-  The active implementation is TypeScript, Vite, and Phaser.
+  The active implementation is a TypeScript/Phaser game client embedded by an Astro knowledge garden.
 
   Current prototype direction:
   - Build an ugly, one-map, browser-playable, AI-verifiable vertical slice before final art, campaign systems, progression, monetization, or production networking.
@@ -11,12 +11,13 @@ context: |
   - The static GitHub Pages client must still load without a backend relay.
 
   Important source areas:
-  - src/main.ts boots Phaser, installs the debug API, and wires local mock transport.
-  - src/game/state.ts owns serializable game state and command application.
-  - src/game/debug.ts exposes window.__DEFEND_DEBUG__ for browser automation.
-  - src/net/transport.ts defines the transport abstraction and mock transport.
-  - src/scenes/PrototypeScene.ts renders the current prototype scene.
-  - tests/ covers state, debug API, and transport behavior.
+  - defend-game-client/src/runtime/phaserApp.ts exposes the host-independent mount API.
+  - defend-game-client/src/game/state.ts owns serializable game state and command application.
+  - defend-game-client/src/game/debug.ts exposes window.__DEFEND_DEBUG__ for browser automation.
+  - defend-game-client/src/net/transport.ts defines the transport abstraction and mock transport.
+  - defend-game-client/src/scenes/PrototypeScene.ts renders the current prototype scene.
+  - web/ owns the Astro host, docs rendering, browser integration tests, and Pages build.
+  - docs/ owns human-facing knowledge and development instructions.
 
   Existing consolidated specs in openspec/specs/ describe current intended behavior.
   Future behavior changes should be proposed under openspec/changes/<change-name>/,
@@ -36,7 +37,7 @@ rules:
     - Keep implementation details in design.md or tasks.md unless they are externally observable behavior.
     - Include scenarios that can be validated through browser state, tests, or user-visible prototype behavior.
   design:
-    - Prefer small changes that preserve the TypeScript/Vite/Phaser structure already in src/.
+    - Prefer small changes that preserve the game-client, web-host, docs, and server-stub boundaries.
     - Describe how serializable game state, Phaser rendering, debug state, and tests stay aligned.
     - Call out risks around deterministic tests, browser automation, and future networking.
   tasks:

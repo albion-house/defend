@@ -1,5 +1,8 @@
 # Aube reads this workspace file during project installs.
 # Keep the package release-age gate aligned with mise's 5 day tool gate.
+packages:
+  - defend-game-client
+  - web
 minimumReleaseAge: 7200
 allowBuilds:
   esbuild: true

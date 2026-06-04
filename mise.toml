@@ -12,15 +12,15 @@ node = "24"
 "npm:@fission-ai/openspec" = "latest"
 
 [tasks.install]
-description = "Install Astro platform and Phaser prototype dependencies"
+description = "Install workspace dependencies"
 run = "aube install --prefer-frozen-lockfile"
 
 [tasks.dev]
-description = "Run the Astro development server"
+description = "Run the knowledge garden and embedded game"
 run = "aube run dev"
 
 [tasks.build]
-description = "Build the static Astro game platform"
+description = "Build the game client and static knowledge garden"
 run = "aube run build"
 
 [tasks.preview]
@@ -32,8 +32,12 @@ description = "Run TypeScript static checks"
 run = "aube run lint"
 
 [tasks.test]
-description = "Run unit tests"
+description = "Run workspace unit tests"
 run = "aube run test"
+
+[tasks."test:client"]
+description = "Verify the game client without Astro"
+run = "aube run test:client"
 
 [tasks."test:e2e"]
 description = "Run Playwright browser tests"
@@ -68,5 +72,5 @@ description = "Show repository status"
 run = "git status --short --branch"
 
 [tasks.check]
-description = "Run lint, tests, build, browser smoke checks, and OpenSpec validation"
-run = "aube run lint && aube run test && aube run build && aube run test:e2e:public && aube run spec-check"
+description = "Run workspace, browser, and OpenSpec validation"
+run = "aube run check"

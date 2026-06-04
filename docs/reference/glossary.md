@@ -1,31 +1,31 @@
-# Defend Glossary
+---
+title: glossary
+summary: the words we keep using.
+order: 41
+---
 
-This glossary is the canonical home for recurring Defend vocabulary. Add terms here when they appear across specs, implementation, UI copy, or developer discussion often enough that their meaning could drift. Prefer established industry or genre terms when they accurately describe Defend behavior.
+# glossary
 
-## Terms
+## exit
 
-### Exit
+the end of an enemy path. enemies that reach it leak.
 
-The end of an enemy path where enemy combatants leave the lane and cause a leak event.
+## fixed tick
 
-### Fixed Tick
+one deterministic simulation step. defend currently uses 100 ms ticks.
 
-A fixed tick is one deterministic simulation step. Defend currently uses 100 ms ticks for gameplay rules so replay tests and future multiplayer experiments can advance state from ordered commands rather than render-frame timing.
+## gate
 
-### Gate
+the defended objective in saltmarsh crossing.
 
-The defended objective in Saltmarsh Crossing. Enemies that reach the gate leak and reduce objective HP.
+## leak
 
-### Leak
+an enemy reaches the exit, leaves the simulation, and damages the gate.
 
-A leak is the event when an enemy combatant reaches the exit, leaves active simulation, and applies its configured leak damage to objective HP.
+## saltmarsh crossing
 
-Leak is a gameplay lifecycle term, not just a synonym for damage. After a leak, the enemy combatant is no longer counted as active for wave simulation.
+the first playable mission. two lanes meet near one defended gate.
 
-### Saltmarsh Crossing
+## simulation command
 
-The first playable Defend mission. It is an original map with two causeway lanes, a merge point, fixed build pads, escalating waves, and restartable victory/defeat flow.
-
-### Simulation Command
-
-A serializable player or automation intent applied to game state, such as building a tower, starting a wave, restarting the mission, or advancing fixed simulation ticks.
+a serializable player or automation action. building a tower and starting a wave are commands.

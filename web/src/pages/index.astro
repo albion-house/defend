@@ -1,0 +1,39 @@
+---
+import GameSurface from "../components/GameSurface.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getGardenEntries, getGardenEntry } from "../garden";
+
+const home = getGardenEntry("");
+if (!home) {
+  throw new Error("docs/index.md is missing");
+}
+const { Content } = home;
+const entries = getGardenEntries().filter((entry) => entry.slug);
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const hrefWithBase = (href: string) => `${base}${href}`;
+---
+
+<BaseLayout title="defend" description="notes from the making of defend.">
+  <section class="hero">
+    <div class="section-frame hero-grid">
+      <article class="prose">
+        <Content />
+      </article>
+      <GameSurface />
+    </div>
+  </section>
+
+  <section class="surface-band">
+    <div class="section-frame">
+      <p class="eyebrow">everything else</p>
+      <div class="garden-grid">
+        {entries.map((entry) => (
+          <a class="garden-card" href={hrefWithBase(entry.href)}>
+            <strong>{entry.title}</strong>
+            <span>{entry.summary}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

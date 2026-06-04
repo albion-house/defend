@@ -16,6 +16,7 @@ mise.*.local.lock
 node_modules/
 .astro/
 dist/
+fixture-dist/
 coverage/
 playwright-report/
 test-results/

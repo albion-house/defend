@@ -13,11 +13,11 @@ The system SHALL run as a static web application deployable to GitHub Pages with
 - **THEN** a player SHALL be able to open the prototype in a browser without installing native software
 
 ### Requirement: Phaser game entry point
-The repository SHALL contain a TypeScript Phaser client with explicit source folders for scenes, systems, network abstractions, and shared game state.
+The repository SHALL contain a TypeScript Phaser client under `defend-game-client/` with explicit source folders for scenes, systems, network abstractions, and shared game state.
 
-#### Scenario: Developer inspects the web project
+#### Scenario: Developer inspects the game-client project
 - **GIVEN** a developer has cloned the repository
-- **WHEN** they inspect `src/`
+- **WHEN** they inspect `defend-game-client/src/`
 - **THEN** they SHALL find the Phaser boot path, prototype scene code, game state model, and network abstraction entry points
 
 ### Requirement: GitHub Pages-compatible build
@@ -26,7 +26,7 @@ The web client SHALL build into static assets suitable for GitHub Pages hosting.
 #### Scenario: Static production build
 - **GIVEN** dependencies are installed
 - **WHEN** the developer runs the build task
-- **THEN** the build output SHALL be generated as static browser assets under `dist/`
+- **THEN** the build output SHALL be generated as static browser assets under `web/dist/`
 
 ### Requirement: Automatic main branch Pages publication
 The system SHALL publish every successful production build from `main` to GitHub Pages without manual deployment steps.
@@ -56,7 +56,7 @@ The system SHALL verify after GitHub Pages publication that the beginning of the
 The web game structure SHALL keep deterministic simulation, content data, debug state, and Phaser rendering in identifiable modules.
 
 #### Scenario: Developer inspects source structure
-- **WHEN** a developer inspects `src/`
+- **WHEN** a developer inspects `defend-game-client/src/`
 - **THEN** they SHALL be able to identify content definitions, simulation rules, debug API, transport boundary, and Phaser scene rendering
 
 ### Requirement: GitHub Pages build remains verified
@@ -70,7 +70,7 @@ The project SHALL retain a build path that produces static assets compatible wit
 The browser game structure SHALL host the public site through Astro while keeping Phaser runtime modules identifiable and client-only.
 
 #### Scenario: Developer inspects Astro game structure
-- **WHEN** a developer inspects `src/`
+- **WHEN** a developer inspects `web/src/` and `defend-game-client/src/`
 - **THEN** they SHALL be able to distinguish Astro pages/components/content from Phaser runtime mounting, game state, scenes, systems, and network abstractions
 
 ### Requirement: Pages-compatible Astro build
@@ -79,4 +79,4 @@ The GitHub Pages build path SHALL publish the Astro static output without requir
 #### Scenario: Static Astro production build
 - **GIVEN** dependencies are installed
 - **WHEN** the developer runs the production build task
-- **THEN** the build output SHALL be generated as static browser assets under `dist/` with repository Pages base-path compatibility
+- **THEN** the build output SHALL be generated as static browser assets under `web/dist/` with repository Pages base-path compatibility

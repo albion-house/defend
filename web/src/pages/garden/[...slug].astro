@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getGardenEntries, getGardenEntry } from "../../garden";
+
+export function getStaticPaths() {
+  return getGardenEntries()
+    .filter((entry) => entry.slug)
+    .map((entry) => ({ params: { slug: entry.slug } }));
+}
+
+const entry = getGardenEntry(Astro.params.slug ?? "");
+if (!entry) {
+  return Astro.redirect("/");
+}
+const { Content } = entry;
+---
+
+<BaseLayout title={`${entry.title} | defend`} description={entry.summary}>
+  <section class="compact-page">
+    <article class="section-frame prose garden-page">
+      <Content />
+    </article>
+  </section>
+</BaseLayout>
