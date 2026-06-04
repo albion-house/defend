@@ -1,31 +1,30 @@
-# Defend
+# defend
 
-Defend is a browser-playable tower-defense prototype and Astro-based game platform. The current build is a legally distinct, single-player first playable made with TypeScript, Astro, and Phaser, with a deterministic simulation core shaped for future remote co-op experiments.
+**defend** is a tower defense game prototype. it's currently single-player. we'd like to make it playable by two players. 
 
-A pre-pivot checkpoint is preserved by git tag:
+at https://albion-house.github.io/defend/ you can play the game and browse our little game dev knowledge garden about it.
 
-```sh
-git checkout pre-phaser-pivot
-```
 
-## Setup
+## local dev setup
 
-Project tooling is managed with [mise](https://mise.jdx.dev/). The repository follows a stable/LTS-first toolchain policy: Node stays on the current supported major line in `mise.toml`, Aube is the preferred npm-compatible package manager, and `mise.lock` records exact resolved tool versions.
+install [mise](https://mise.jdx.dev/). 
 
 ```sh
+# install cli deps (this is a built-in mise command)
 mise install
+# run installation scripts (our scripts)
 mise run install
-```
-
-The normal task path uses Aube through mise. npm remains a fallback for local environment diagnosis, and Python is not part of this project toolchain.
-
-## Run
-
-```sh
+# run the website locally
 mise run dev
 ```
 
-Astro serves the platform locally. The home route embeds the playable Phaser prototype and links to canonical routes for themes, factions, design-system docs, rendering experiments, asset previews, and gameplay documentation.
+## tech stack
+
+--- 
+
+*below this line, we need some rhetorical adjustments.*
+---
+astro serves the platform locally. The home route embeds the playable Phaser prototype and links to canonical routes for themes, factions, design-system docs, rendering experiments, asset previews, and gameplay documentation.
 
 The playable surface is **Saltmarsh Crossing**, an original one-map mission with two bending lanes, a merge chokepoint, one defended gate, eight curated build pads, shared gold, escalating scripted waves, victory/defeat, and instant restart.
 
