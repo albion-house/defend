@@ -12,13 +12,27 @@ The system SHALL run as a static web application deployable to GitHub Pages with
 - **WHEN** the static files are deployed to GitHub Pages
 - **THEN** a player SHALL be able to open the prototype in a browser without installing native software
 
-### Requirement: Phaser game entry point
-The repository SHALL contain a TypeScript Phaser client under `defend-game-client/` with explicit source folders for scenes, systems, network abstractions, and shared game state.
+### Requirement: Host-independent game-client mount API
+The game-client package SHALL expose a public browser API that mounts and destroys the playable game inside a host-provided element without requiring Astro.
 
-#### Scenario: Developer inspects the game-client project
+#### Scenario: Plain webpage embeds the game
+- **WHEN** a webpage provides a compatible host element and calls the game-client mount API
+- **THEN** the Phaser game SHALL mount, expose its supported automation state, and support teardown without importing an Astro component
+
+### Requirement: Game-client-owned automation contract
+The game-client package SHALL own the semantic debug API and deterministic game-state behavior required by automation without requiring host-specific site markup beyond its documented embed contract.
+
+#### Scenario: Automation inspects an embedded client
+- **WHEN** the game client is embedded by a supported non-Astro host
+- **THEN** automation SHALL be able to inspect and drive the current playable mission through the supported game-client contract
+
+### Requirement: Phaser game entry point
+The repository SHALL contain a TypeScript Phaser client under `defend-game-client/` with explicit source folders for scenes, systems, network abstractions, shared game state, and the public embedding API.
+
+#### Scenario: Developer inspects the game project
 - **GIVEN** a developer has cloned the repository
-- **WHEN** they inspect `defend-game-client/src/`
-- **THEN** they SHALL find the Phaser boot path, prototype scene code, game state model, and network abstraction entry points
+- **WHEN** they inspect `defend-game-client/`
+- **THEN** they SHALL find the Phaser boot path, public embedding API, prototype scene code, game state model, and network abstraction entry points
 
 ### Requirement: GitHub Pages-compatible build
 The web client SHALL build into static assets suitable for GitHub Pages hosting.
@@ -53,11 +67,11 @@ The system SHALL verify after GitHub Pages publication that the beginning of the
 - **THEN** the Phaser scene SHALL load, the debug API SHALL report the initial game state, and a build-pad command SHALL update game state successfully
 
 ### Requirement: Simulation-render-data separation
-The web game structure SHALL keep deterministic simulation, content data, debug state, and Phaser rendering in identifiable modules.
+The game-client structure SHALL keep deterministic simulation, runtime content data, debug state, Phaser rendering, and host integration in identifiable modules.
 
-#### Scenario: Developer inspects source structure
-- **WHEN** a developer inspects `defend-game-client/src/`
-- **THEN** they SHALL be able to identify content definitions, simulation rules, debug API, transport boundary, and Phaser scene rendering
+#### Scenario: Developer inspects game-client source
+- **WHEN** a developer inspects `defend-game-client/`
+- **THEN** they SHALL be able to identify content definitions, simulation rules, debug API, transport boundary, Phaser scene rendering, and the public host adapter
 
 ### Requirement: GitHub Pages build remains verified
 The project SHALL retain a build path that produces static assets compatible with repository GitHub Pages hosting.
@@ -67,11 +81,11 @@ The project SHALL retain a build path that produces static assets compatible wit
 - **THEN** static assets SHALL build successfully with the repository base path
 
 ### Requirement: Astro-hosted game structure
-The browser game structure SHALL host the public site through Astro while keeping Phaser runtime modules identifiable and client-only.
+The browser game structure SHALL allow the Astro site to embed the Phaser game through the game client's public API while keeping Astro implementation outside the game-client package.
 
-#### Scenario: Developer inspects Astro game structure
-- **WHEN** a developer inspects `web/src/` and `defend-game-client/src/`
-- **THEN** they SHALL be able to distinguish Astro pages/components/content from Phaser runtime mounting, game state, scenes, systems, and network abstractions
+#### Scenario: Developer inspects site and game boundaries
+- **WHEN** a developer inspects `web/` and `defend-game-client/`
+- **THEN** they SHALL find the Astro embed component in `web/` and all reusable Phaser runtime behavior in `defend-game-client/`
 
 ### Requirement: Pages-compatible Astro build
 The GitHub Pages build path SHALL publish the Astro static output without requiring a runtime server.

@@ -5,33 +5,34 @@ Define the Astro static site shell, canonical platform routes, Phaser embed beha
 
 ## Requirements
 ### Requirement: Astro static site shell
-The system SHALL use Astro as the static site shell for the public Defend browser experience.
+The system SHALL use the Astro project under `web/` as the static site shell for the public Defend knowledge garden and playable browser experience.
 
 #### Scenario: Developer builds the site
 - **WHEN** a developer runs the production build command
-- **THEN** Astro SHALL generate static site assets under `web/dist/`
+- **THEN** the Astro project SHALL generate static GitHub Pages assets
 
 #### Scenario: Visitor opens the home route
 - **WHEN** a visitor opens the built site home route
-- **THEN** the page SHALL present Defend as a playable game platform with navigation to the playable build, theme galleries, design system, rendering sandbox, asset catalog, and gameplay documentation
+- **THEN** the page SHALL introduce Defend, provide access to the knowledge garden, and link to or embed the playable build
 
 ### Requirement: Embedded Phaser play surface
-The Astro site SHALL embed the Phaser runtime as one client-side interactive surface without making the whole site a Phaser application.
+The Astro site SHALL embed the independent game-client package as a client-side interactive surface without making the game client depend on Astro.
 
 #### Scenario: Visitor opens playable route
 - **WHEN** a visitor opens the playable game route in a browser
-- **THEN** the existing Phaser prototype SHALL mount into a dedicated game surface and expose the existing debug API for automation
+- **THEN** the game client SHALL mount into a dedicated surface and expose its supported debug API for automation
 
 #### Scenario: Developer inspects site boundaries
 - **WHEN** a developer inspects source modules
-- **THEN** Astro pages and design-system presentation code SHALL be separate from runtime game, scene, network, and simulation modules
+- **THEN** Astro pages, content integration, and site presentation SHALL be separate from the reusable game-client package
 
 ### Requirement: Canonical platform routes
-The Astro site SHALL provide stable routes for the major public platform surfaces.
+The Astro site SHALL provide stable access to the knowledge-garden home and playable build without requiring a dedicated route for every design note, experiment, asset entry, or speculative topic.
 
-#### Scenario: Route inventory is rendered
-- **WHEN** the site is built
-- **THEN** routes SHALL exist for playable game, biome/theme galleries, faction previews, design system, rendering sandbox, asset previews, and gameplay mechanic documentation
+#### Scenario: Public site is built
+- **WHEN** the production site build completes
+- **THEN** visitors SHALL be able to reach the knowledge garden and playable build
+- **AND** optional knowledge-garden topics MAY be organized according to their content rather than a fixed product-route inventory
 
 ### Requirement: Deployment version continuity
 The Astro site SHALL preserve visible deployment version information used by deployment verification.
