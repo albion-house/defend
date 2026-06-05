@@ -81,7 +81,7 @@ jobs:
         run: aube ci
 
       - name: Install Playwright Chromium
-        run: aube exec playwright install --with-deps chromium
+        run: mise //web:playwright:install
 
       - name: Verify public Pages deployment
         run: mise //web:test:e2e:public

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Install Playwright browser dependencies for the Astro site"
+set -euo pipefail
+playwright install --with-deps chromium
