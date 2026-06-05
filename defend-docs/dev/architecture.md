@@ -9,13 +9,13 @@ order: 11
 the repo has four clear homes.
 
 ```text
-docs/ --------------------> web/
+defend-docs/ -------------> web/
 defend-game-client/ ------> web/
 
 defend-game-server/         reserved only
 ```
 
-## docs
+## defend-docs
 
 human-facing knowledge. development notes. design work. journal entries. references. speculation.
 
@@ -41,4 +41,4 @@ a reserved space. no architecture has been chosen.
 
 precise dev-time requirements for the two core developers and coding agents.
 
-human instructions belong here in `docs/`, not duplicated in OpenSpec.
+human instructions belong here in `defend-docs/`, not duplicated in OpenSpec.

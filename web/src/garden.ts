@@ -18,13 +18,13 @@ export interface GardenEntry {
   Content: GardenModule["Content"];
 }
 
-const modules = import.meta.glob("../../docs/**/*.md", { eager: true }) as Record<string, GardenModule>;
+const modules = import.meta.glob("../../defend-docs/**/*.md", { eager: true }) as Record<string, GardenModule>;
 
 export function getGardenEntries(): GardenEntry[] {
   return Object.entries(modules)
     .map(([path, module]) => {
       const slug = path
-        .replace("../../docs/", "")
+        .replace("../../defend-docs/", "")
         .replace(/(?:^|\/)(?:README|index)\.md$/, "")
         .replace(/\.md$/, "");
 

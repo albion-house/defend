@@ -5,7 +5,7 @@ import { getGardenEntries, getGardenEntry } from "../garden";
 
 const home = getGardenEntry("");
 if (!home) {
-  throw new Error("docs/index.md is missing");
+  throw new Error("defend-docs/index.md is missing");
 }
 const { Content } = home;
 const entries = getGardenEntries().filter((entry) => entry.slug);

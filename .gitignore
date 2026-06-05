@@ -12,6 +12,19 @@ mise.*.local.lock
 .vscode/
 .idea/
 
+# Obsidian vault-local state. Shared app, core-plugin, and hotkey settings
+# under defend-docs/.obsidian/ stay trackable.
+defend-docs/.obsidian/workspace.json
+defend-docs/.obsidian/workspace-mobile.json
+defend-docs/.obsidian/appearance.json
+defend-docs/.obsidian/graph.json
+defend-docs/.obsidian/bookmarks.json
+defend-docs/.obsidian/cache/
+defend-docs/.obsidian/plugins/
+defend-docs/.obsidian/themes/
+defend-docs/.obsidian/snippets/
+defend-docs/.trash/
+
 # Web dependencies and build artifacts.
 node_modules/
 .astro/

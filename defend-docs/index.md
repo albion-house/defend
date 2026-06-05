@@ -14,6 +14,7 @@ some of it is settled. some of it is a sketch. some of it may never happen.
 
 - [play the current build](play/)
 - [start developing](garden/dev/getting-started/)
+- [open the garden in obsidian](garden/dev/obsidian/)
 - [read about the first playable](garden/design/first-playable/)
 - [look up shared words](garden/reference/glossary/)
 - [browse unfinished ideas](garden/speculation/world-and-art/)

@@ -2,10 +2,10 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const docsRoot = resolve(import.meta.dirname, "../../docs");
+const docsRoot = resolve(import.meta.dirname, "../../defend-docs");
 
 describe("knowledge garden", () => {
-  it("reads canonical markdown from the root docs tree", () => {
+  it("reads canonical markdown from the defend-docs tree", () => {
     const paths = markdownPaths(docsRoot);
 
     expect(paths).toContain("index.md");

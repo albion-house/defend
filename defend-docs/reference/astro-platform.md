@@ -8,7 +8,7 @@ order: 42
 
 the astro site lives in `web/`.
 
-it renders the markdown in `docs/`. it also hosts one playable route.
+it renders the markdown in `defend-docs/`. it also hosts one playable route.
 
 the site imports the public API from `defend-game-client/`. it does not reach into game scenes or simulation internals.
 
