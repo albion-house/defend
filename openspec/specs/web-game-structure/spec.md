@@ -50,6 +50,14 @@ The system SHALL publish every successful production build from `main` to GitHub
 - **WHEN** the GitHub Actions deployment workflow completes successfully
 - **THEN** the public GitHub Pages URL SHALL serve the built Defend client for that change
 
+### Requirement: Pages workflow preserves renamed garden source
+The GitHub Pages publication workflow SHALL remain compatible with the renamed `defend-docs/` garden content root and SHALL continue publishing the Astro static output from `web/dist/`.
+
+#### Scenario: Main branch deployment after garden rename
+- **GIVEN** the garden content root has been renamed to `defend-docs/`
+- **WHEN** the GitHub Actions Pages workflow runs the production build, uploads the Pages artifact, deploys the site, and runs public verification
+- **THEN** the workflow SHALL publish the same public garden and play routes from the built `web/dist/` output
+
 ### Requirement: Visible deployed version identifier
 The browser client SHALL display a deployment version identifier that automation can read from the public page.
 
