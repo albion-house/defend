@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Show OpenSpec CLI help"
+set -euo pipefail
+openspec --help

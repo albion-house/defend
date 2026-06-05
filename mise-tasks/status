@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Show repository status"
+set -euo pipefail
+git status --short --branch

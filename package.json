@@ -7,19 +7,6 @@
     "defend-game-client",
     "web"
   ],
-  "scripts": {
-    "dev": "aube --filter @albion-house/defend-web run dev",
-    "build": "aube -r run build",
-    "preview": "aube --filter @albion-house/defend-web run preview",
-    "lint": "aube -r run lint",
-    "test": "aube -r run test",
-    "test:client": "aube --filter @albion-house/defend-game-client run check",
-    "test:e2e": "aube run test:e2e:local",
-    "test:e2e:local": "aube --filter @albion-house/defend-web run test:e2e:local",
-    "test:e2e:public": "aube --filter @albion-house/defend-web run test:e2e:public",
-    "spec-check": "openspec validate --all --strict --no-interactive",
-    "check": "aube run lint && aube run test && aube run test:client && aube run build && aube run test:e2e:local && aube run spec-check"
-  },
   "devDependencies": {
     "@types/node": "latest"
   }

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Validate OpenSpec changes and specs"
+#MISE depends=[":openspec:check"]
+set -euo pipefail

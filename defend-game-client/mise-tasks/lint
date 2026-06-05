@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Type-check the game client"
+set -euo pipefail
+tsc --noEmit --pretty false

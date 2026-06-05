@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Verify the game client compiles"
+set -euo pipefail
+tsc --noEmit

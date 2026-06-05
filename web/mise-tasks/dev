@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run the Astro knowledge garden with the embedded game"
+set -euo pipefail
+astro dev --host 127.0.0.1

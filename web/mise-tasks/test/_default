@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run Astro site unit tests"
+set -euo pipefail
+vitest run

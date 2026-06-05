@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run game client unit tests"
+set -euo pipefail
+vitest run

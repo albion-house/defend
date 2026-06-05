@@ -10,13 +10,6 @@
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css"
   },
-  "scripts": {
-    "build": "tsc --noEmit",
-    "lint": "tsc --noEmit --pretty false",
-    "test": "vitest run",
-    "test:embed": "vite build --config vite.fixture.config.ts && playwright test",
-    "check": "aube run lint && aube run test && aube run test:embed && aube run build"
-  },
   "dependencies": {
     "phaser": "latest"
   },

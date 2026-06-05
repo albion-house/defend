@@ -3,17 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "astro dev --host 127.0.0.1",
-    "build": "tsc --noEmit && astro build",
-    "preview": "astro preview --host 127.0.0.1",
-    "lint": "tsc --noEmit --pretty false",
-    "test": "vitest run",
-    "test:e2e": "aube run test:e2e:local",
-    "test:e2e:local": "aube run build && playwright test",
-    "test:e2e:public": "playwright test",
-    "check": "aube run lint && aube run test && aube run build && aube run test:e2e:local"
-  },
   "dependencies": {
     "@albion-house/defend-game-client": "file:../defend-game-client",
     "astro": "^6.3.7"

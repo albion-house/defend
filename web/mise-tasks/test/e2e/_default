@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run Playwright browser tests against a local build"
+#MISE depends=[":test:e2e:local"]
+set -euo pipefail

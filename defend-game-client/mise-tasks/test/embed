@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Verify the game client mounts in a standalone browser fixture"
+set -euo pipefail
+vite build --config vite.fixture.config.ts
+playwright test

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Install workspace dependencies"
+set -euo pipefail
+aube install --prefer-frozen-lockfile

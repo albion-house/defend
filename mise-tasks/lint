@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Type-check every workspace"
+#MISE depends=["//...:lint"]
+set -euo pipefail

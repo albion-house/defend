@@ -83,7 +83,7 @@ test("knowledge garden and play route render canonical surfaces", async ({ page,
   await expect(page.locator("#game-root canvas")).toBeVisible();
 
   const routes = [
-    { path: "/garden/dev/getting-started/", heading: "getting started", text: "mise run dev" },
+    { path: "/garden/dev/getting-started/", heading: "getting started", text: "mise //web:dev" },
     { path: "/garden/design/first-playable/", heading: "first playable", text: "saltmarsh crossing" },
     { path: "/garden/reference/glossary/", heading: "glossary", text: "simulation command" },
     { path: "/garden/speculation/world-and-art/", heading: "world and art sketches", text: "none of this is promised" },

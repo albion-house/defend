@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Validate the game client without Astro"
+#MISE depends=[":lint", ":test", ":test:embed", ":build"]
+set -euo pipefail

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Build the game client and static knowledge garden"
+#MISE depends=["//...:build"]
+set -euo pipefail

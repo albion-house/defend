@@ -6,18 +6,20 @@ order: 12
 
 # commands and testing
 
-run commands from the repo root.
+run commands from the repo root. tasks are file-based mise tasks in monorepo mode, addressed as `//<project>:<task>`. root-level tasks are `//:<task>`.
 
 ```sh
-mise run dev
-mise run test
-mise run build
-mise run test:e2e
-mise run spec-check
-mise run check
+mise //web:dev            # run the knowledge garden with the embedded game
+mise //...:test           # unit tests across every project
+mise //:build             # build the game client and static garden
+mise //web:test:e2e       # local Playwright browser tests
+mise //:spec-check        # validate OpenSpec
+mise //:check             # validate everything (see below)
 ```
 
-`mise run check` validates both workspace packages, the local browser integration, and OpenSpec.
+`mise //:check` validates both workspace packages, the local browser integration, and OpenSpec.
+
+the older `mise run <task>` form no longer applies — tasks are addressed by their monorepo path. run `mise tasks --all` to list them.
 
 the game client also has a standalone browser fixture. it proves that the game can mount, run, and tear down without astro.
 

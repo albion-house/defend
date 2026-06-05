@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run workspace, browser, and OpenSpec validation"
+#MISE depends=["//...:lint", "//...:test", "//defend-game-client:test:embed", "//...:build", "//web:test:e2e:local", ":openspec:check"]
+set -euo pipefail

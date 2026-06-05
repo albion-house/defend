@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Build the static knowledge garden"
+set -euo pipefail
+tsc --noEmit
+astro build

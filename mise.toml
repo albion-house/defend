@@ -1,76 +1,21 @@
 #:schema https://mise.en.dev/schema/mise.json
 min_version = "2026.5.3"
 
+# Monorepo mode: each workspace (see [monorepo].config_roots) owns its own
+# file-based tasks, addressed as //<workspace>:<task>. Root-level tasks live in
+# ./mise-tasks and are addressed as //:<task>. No npm scripts are used anywhere.
+experimental_monorepo_root = true
+
 [settings]
+experimental = true
 lockfile = true
 minimum_release_age = "5d"
 npm.package_manager = "auto"
+
+[monorepo]
+config_roots = ["defend-game-client", "web"]
 
 [tools]
 aube = "latest"
 node = "24"
 "npm:@fission-ai/openspec" = "latest"
-
-[tasks.install]
-description = "Install workspace dependencies"
-run = "aube install --prefer-frozen-lockfile"
-
-[tasks.dev]
-description = "Run the knowledge garden and embedded game"
-run = "aube run dev"
-
-[tasks.build]
-description = "Build the game client and static knowledge garden"
-run = "aube run build"
-
-[tasks.preview]
-description = "Preview the production build locally"
-run = "aube run preview"
-
-[tasks.lint]
-description = "Run TypeScript static checks"
-run = "aube run lint"
-
-[tasks.test]
-description = "Run workspace unit tests"
-run = "aube run test"
-
-[tasks."test:client"]
-description = "Verify the game client without Astro"
-run = "aube run test:client"
-
-[tasks."test:e2e"]
-description = "Run Playwright browser tests"
-run = "aube run build && aube exec playwright test"
-
-[tasks."test:e2e:local"]
-description = "Build and verify the production preview with Playwright"
-run = "aube run build && aube exec playwright test"
-
-[tasks."test:e2e:public"]
-description = "Verify a published Pages deployment with Playwright"
-run = "aube run test:e2e:public"
-
-[tasks.openspec]
-description = "Run the OpenSpec CLI"
-run = "openspec"
-
-[tasks."openspec:check"]
-description = "Check OpenSpec project state"
-run = "openspec validate --all --strict --no-interactive"
-
-[tasks."openspec:help"]
-description = "Show OpenSpec CLI help"
-run = "openspec --help"
-
-[tasks."spec-check"]
-description = "Validate OpenSpec changes and specs"
-run = "aube run spec-check"
-
-[tasks.status]
-description = "Show repository status"
-run = "git status --short --branch"
-
-[tasks.check]
-description = "Run workspace, browser, and OpenSpec validation"
-run = "aube run check"

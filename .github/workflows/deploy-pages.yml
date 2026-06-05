@@ -39,7 +39,7 @@ jobs:
           echo "Deployment version: ${deployment_version}"
 
       - name: Build
-        run: aube run build
+        run: mise //:build
         env:
           GITHUB_PAGES: "true"
           VITE_DEFEND_DEPLOY_VERSION: ${{ steps.version.outputs.deployment_version }}
@@ -84,7 +84,7 @@ jobs:
         run: aube exec playwright install --with-deps chromium
 
       - name: Verify public Pages deployment
-        run: aube run test:e2e:public
+        run: mise //web:test:e2e:public
         env:
           DEFEND_PUBLIC_BASE_URL: ${{ needs.deploy.outputs.page_url }}
           DEFEND_EXPECTED_VERSION: ${{ needs.build.outputs.deployment_version }}

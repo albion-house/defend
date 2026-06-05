@@ -1,0 +1,7 @@
+#:schema https://mise.en.dev/schema/mise.json
+
+# Expose this workspace's aube-installed binaries (astro, tsc, vite, vitest,
+# playwright) on PATH so file tasks invoke them directly — no `aube exec`,
+# no npm scripts. Versions come solely from the workspace lockfile.
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]

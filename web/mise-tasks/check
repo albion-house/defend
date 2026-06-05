@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Validate the Astro site, build, and local browser coverage"
+#MISE depends=[":lint", ":test", ":build", ":test:e2e:local"]
+set -euo pipefail

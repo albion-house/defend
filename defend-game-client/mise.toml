@@ -1,0 +1,6 @@
+#:schema https://mise.en.dev/schema/mise.json
+
+# Expose this workspace's aube-installed binaries on PATH so file tasks invoke
+# them directly. Versions come solely from the workspace lockfile.
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]

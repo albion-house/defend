@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Verify a published Pages deployment with Playwright"
+set -euo pipefail
+playwright test

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run unit tests across every workspace"
+#MISE depends=["//...:test"]
+set -euo pipefail
