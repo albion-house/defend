@@ -24,6 +24,15 @@ describe("debug observability", () => {
     });
     expect(description.controls).toContain("tower:build");
     expect(description.controls).toContain("simulation:step");
+    expect(description.controls).toContain("hero_input");
+    expect(description.heroes).toHaveLength(1);
+    expect(description.heroes[0]).toMatchObject({
+      heroId: "hero:p1",
+      playerSlot: "p1",
+      connected: true
+    });
+    expect(description.heroProjectiles).toEqual([]);
+    expect(description.heroEvents).toEqual([]);
     expect(description.activeEnemyCount).toBe(0);
   });
 
@@ -79,6 +88,31 @@ describe("debug observability", () => {
     expect(api.getState().buildPads[1].occupiedBy).toBe("tower-1-ranger-post");
     expect(api.getState().enemies).toHaveLength(4);
     expect(api.describe().deploymentVersion).toBe("0.1.0+domtest");
+  });
+
+  it("installs a Defend test driver when enabled", () => {
+    let state: GameState = createInitialGameState("driver-test");
+    const dispatch = (command: GameCommand) => {
+      state = applyGameCommand(state, command);
+      return state;
+    };
+    const api = installDebugApi(() => state, dispatch, "0.1.0+drivertest", {
+      enableTestDriver: true,
+      playerSlot: "p1"
+    });
+    const driver = api.testDriver;
+    if (!driver) {
+      throw new Error("test driver missing");
+    }
+
+    expect(driver.getPlayerSlot()).toBe("p1");
+    driver.pressKey("d");
+    const moved = driver.waitForTick(state.tick + 2);
+    driver.releaseKey("d");
+
+    expect(moved.heroes.find((candidate) => candidate.playerSlot === "p1")?.x).toBeGreaterThan(850);
+    expect(driver.getRenderedEntities().heroes[0].heroId).toBe("hero:p1");
+    expect(driver.getEventLog().some((event) => event.type === "hero.input_received")).toBe(true);
   });
 
   it("dispatches deterministic simulation through the debug API", () => {

@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { getMissionContent, type GameCommand, type GameState, type TowerTypeId, type Vec2 } from "../game/state";
+import { getMissionContent, type GameCommand, type GameState, type PlayerId, type TowerTypeId, type Vec2 } from "../game/state";
 
 const WORLD_WIDTH = 1280;
 const WORLD_HEIGHT = 720;
@@ -27,7 +27,10 @@ const colors = {
   magic: 0xc5a3ff,
   blocker: 0x9ad38b,
   enemy: 0xf5f0df,
-  enemyCore: 0xd95d5d
+  enemyCore: 0xd95d5d,
+  heroP1: 0x7ed7ff,
+  heroP2: 0xb88cff,
+  heroShot: 0xffffff
 };
 
 const towerColors: Record<TowerTypeId, number> = {
@@ -54,10 +57,16 @@ export class PrototypeScene extends Phaser.Scene {
   private labelGroup?: Phaser.GameObjects.Group;
   private scaleResizeHandler?: () => void;
   private tickAccumulatorMs = 0;
+  private heroKeys?: Record<string, Phaser.Input.Keyboard.Key>;
+  private inputSeq = 0;
+  private fireHeld = false;
+  private pointerWorld: Vec2 | null = null;
+  private lastHeroInputSignature = "";
 
   constructor(
     private readonly getState: () => GameState,
-    private readonly dispatch: (command: GameCommand) => GameState
+    private readonly dispatch: (command: GameCommand) => GameState,
+    private readonly playerSlot: PlayerId = "p1"
   ) {
     super("PrototypeScene");
   }
@@ -91,6 +100,7 @@ export class PrototypeScene extends Phaser.Scene {
     });
 
     this.renderState();
+    this.installHeroInput();
     this.scaleResizeHandler = () => this.renderState();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.scaleResizeHandler);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -108,7 +118,8 @@ export class PrototypeScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const state = this.getState();
-    if (state.wave.active && state.mission.status === "active") {
+    this.sendHeroInputFromControls();
+    if (state.mission.status !== "victory" && state.mission.status !== "defeat") {
       this.tickAccumulatorMs += delta;
       const ticks = Math.floor(this.tickAccumulatorMs / state.mission.fixedTickMs);
       if (ticks > 0) {
@@ -133,9 +144,10 @@ export class PrototypeScene extends Phaser.Scene {
     this.drawObjective(state.objective);
     this.drawBuildPads(state);
     this.drawTowers(state);
+    this.drawHeroProjectiles(state);
     this.drawEnemies(state);
     this.drawEffects(state);
-    this.drawPlayers(state.players);
+    this.drawHeroes(state);
     this.drawLabels();
     this.drawPanelHeader(state);
     this.drawTowerButtons(state);
@@ -147,7 +159,7 @@ export class PrototypeScene extends Phaser.Scene {
       `Objective ${state.objective.currentHp}/${state.objective.maxHp}`,
       `Gold ${state.sharedGold}`,
       `Wave ${state.wave.index}/${state.wave.total} ${this.formatWaveLabel(state)}`,
-      `Towers ${state.towers.length}  Enemies ${state.enemies.length}`
+      `Towers ${state.towers.length}  Enemies ${state.enemies.length}  Heroes ${state.heroes.filter((hero) => hero.connected).length}`
     ]);
     this.guideText?.setText(this.guideForState(state));
     this.logText?.setText(state.messageLog.slice(0, 3).join("\n"));
@@ -281,12 +293,27 @@ export class PrototypeScene extends Phaser.Scene {
     graphics.fillRect(objective.position.x - 42, objective.position.y + 72, 84 * healthProgress, 8);
   }
 
-  private drawPlayers(players: GameState["players"]): void {
+  private drawHeroProjectiles(state: GameState): void {
     const graphics = this.requireGraphics();
-    for (const player of players.filter((candidate) => candidate.connected)) {
-      graphics.fillStyle(player.id === "p1" ? 0x7ed7ff : 0xb88cff, player.connected ? 0.9 : 0.28);
-      graphics.fillCircle(player.position.x, player.position.y, 18);
-      this.addLabel(player.position.x - 8, player.position.y - 7, player.id.toUpperCase(), 11, "#101410");
+    for (const projectile of state.heroProjectiles) {
+      graphics.fillStyle(colors.heroShot, 0.95);
+      graphics.lineStyle(2, colors.ranger, 0.9);
+      graphics.fillCircle(projectile.x, projectile.y, projectile.radius);
+      graphics.strokeCircle(projectile.x, projectile.y, projectile.radius + 2);
+    }
+  }
+
+  private drawHeroes(state: GameState): void {
+    const graphics = this.requireGraphics();
+    for (const hero of state.heroes.filter((candidate) => candidate.connected)) {
+      const color = hero.playerSlot === "p1" ? colors.heroP1 : colors.heroP2;
+      graphics.fillStyle(color, hero.alive ? 0.92 : 0.3);
+      graphics.lineStyle(3, 0x101410, 0.92);
+      graphics.fillCircle(hero.x, hero.y, hero.radius);
+      graphics.strokeCircle(hero.x, hero.y, hero.radius);
+      graphics.lineStyle(4, colors.heroShot, 0.92);
+      graphics.lineBetween(hero.x, hero.y, hero.x + hero.aimX * (hero.radius + 16), hero.y + hero.aimY * (hero.radius + 16));
+      this.addLabel(hero.x - 8, hero.y - 7, hero.playerSlot.toUpperCase(), 11, "#101410");
     }
   }
 
@@ -447,6 +474,64 @@ export class PrototypeScene extends Phaser.Scene {
       fontSize: `${size}px`
     });
     this.labelGroup?.add(label);
+  }
+
+  private installHeroInput(): void {
+    this.heroKeys = this.input.keyboard?.addKeys({
+      up: "W",
+      left: "A",
+      down: "S",
+      right: "D",
+      arrowUp: "UP",
+      arrowLeft: "LEFT",
+      arrowDown: "DOWN",
+      arrowRight: "RIGHT"
+    }) as Record<string, Phaser.Input.Keyboard.Key> | undefined;
+    this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+      this.pointerWorld = { x: pointer.worldX, y: pointer.worldY };
+    });
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.pointerWorld = { x: pointer.worldX, y: pointer.worldY };
+      this.fireHeld = true;
+      this.sendHeroInputFromControls(true);
+    });
+    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      this.pointerWorld = { x: pointer.worldX, y: pointer.worldY };
+      this.fireHeld = false;
+      this.sendHeroInputFromControls(true);
+    });
+  }
+
+  private sendHeroInputFromControls(force = false): void {
+    const hero = this.getState().heroes.find((candidate) => candidate.playerSlot === this.playerSlot);
+    if (!hero?.connected) {
+      return;
+    }
+    const moveX = this.isDown("right", "arrowRight") ? 1 : this.isDown("left", "arrowLeft") ? -1 : 0;
+    const moveY = this.isDown("down", "arrowDown") ? 1 : this.isDown("up", "arrowUp") ? -1 : 0;
+    const aimX = this.pointerWorld ? this.pointerWorld.x - hero.x : hero.aimX;
+    const aimY = this.pointerWorld ? this.pointerWorld.y - hero.y : hero.aimY;
+    const signature = `${moveX}:${moveY}:${Math.round(aimX)}:${Math.round(aimY)}:${this.fireHeld ? 1 : 0}`;
+    if (!force && signature === this.lastHeroInputSignature) {
+      return;
+    }
+    this.lastHeroInputSignature = signature;
+    this.inputSeq += 1;
+    this.dispatch({
+      type: "hero_input",
+      playerId: this.playerSlot,
+      inputSeq: this.inputSeq,
+      moveX,
+      moveY,
+      aimX,
+      aimY,
+      fireHeld: this.fireHeld
+    });
+    this.renderState();
+  }
+
+  private isDown(primary: string, secondary: string): boolean {
+    return Boolean(this.heroKeys?.[primary]?.isDown || this.heroKeys?.[secondary]?.isDown);
   }
 
   private strokePolyline(points: Vec2[]): void {

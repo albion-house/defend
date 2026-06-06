@@ -1,5 +1,5 @@
 import { getMissionContent } from "./state";
-import type { GameCommand, GameState, GameStateSnapshot } from "./state";
+import type { GameCommand, GameState, GameStateSnapshot, HeroInputPayload, PlayerId, Vec2 } from "./state";
 import { getSerializableSnapshot } from "./state";
 
 const fallbackDeploymentVersion = "0.1.0+local";
@@ -62,6 +62,25 @@ export interface DefendDebugState {
     kind: string;
     label: string;
   }>;
+  heroes: Array<{
+    heroId: string;
+    playerSlot: PlayerId;
+    connected: boolean;
+    alive: boolean;
+    position: Vec2;
+    velocity: Vec2;
+    aim: Vec2;
+    cooldownTicks: number;
+  }>;
+  heroProjectiles: Array<{
+    projectileId: string;
+    ownerHeroId: string;
+    position: Vec2;
+    velocity: Vec2;
+    damage: number;
+    expiresAtTick: number;
+  }>;
+  heroEvents: GameState["heroEvents"];
   activeEnemyCount: number;
   enemyPaths: Record<string, number>;
   buildPads: Array<{
@@ -86,6 +105,32 @@ export interface DefendDebugApi {
   getState(): GameStateSnapshot;
   describe(): DefendDebugState;
   dispatch(command: GameCommand): GameStateSnapshot;
+  testDriver?: DefendTestDriver;
+}
+
+export interface DefendRenderedEntities {
+  heroes: DefendDebugState["heroes"];
+  heroProjectiles: DefendDebugState["heroProjectiles"];
+  enemies: DefendDebugState["enemies"];
+  towers: DefendDebugState["towers"];
+}
+
+export interface DefendTestDriver {
+  getPlayerSlot(): PlayerId;
+  getLatestRoomState(): GameStateSnapshot;
+  getRenderedEntities(): DefendRenderedEntities;
+  pressKey(key: string): GameStateSnapshot;
+  releaseKey(key: string): GameStateSnapshot;
+  aimAtWorld(x: number, y: number): GameStateSnapshot;
+  fireDown(): GameStateSnapshot;
+  fireUp(): GameStateSnapshot;
+  waitForTick(tick: number): GameStateSnapshot;
+  getEventLog(): GameState["heroEvents"];
+}
+
+export interface InstallDebugApiOptions {
+  enableTestDriver?: boolean;
+  playerSlot?: PlayerId;
 }
 
 declare global {
@@ -138,6 +183,27 @@ export function describeGameState(
       kind: effect.kind,
       label: effect.label
     })),
+    heroes: state.heroes
+      .filter((hero) => hero.connected)
+      .map((hero) => ({
+        heroId: hero.heroId,
+        playerSlot: hero.playerSlot,
+        connected: hero.connected,
+        alive: hero.alive,
+        position: { x: hero.x, y: hero.y },
+        velocity: { x: hero.velocityX, y: hero.velocityY },
+        aim: { x: hero.aimX, y: hero.aimY },
+        cooldownTicks: hero.weaponCooldownRemainingTicks
+      })),
+    heroProjectiles: state.heroProjectiles.map((projectile) => ({
+      projectileId: projectile.projectileId,
+      ownerHeroId: projectile.ownerHeroId,
+      position: { x: projectile.x, y: projectile.y },
+      velocity: { x: projectile.velocityX, y: projectile.velocityY },
+      damage: projectile.damage,
+      expiresAtTick: projectile.expiresAtTick
+    })),
+    heroEvents: [...state.heroEvents],
     activeEnemyCount: state.enemies.length,
     enemyPaths: state.enemies.reduce<Record<string, number>>((counts, enemy) => {
       counts[enemy.pathId] = (counts[enemy.pathId] ?? 0) + 1;
@@ -165,7 +231,8 @@ export function describeGameState(
       "tower:build",
       "wave:start",
       "mission:restart",
-      "simulation:step"
+      "simulation:step",
+      "hero_input"
     ]
   };
 }
@@ -173,7 +240,8 @@ export function describeGameState(
 export function installDebugApi(
   getState: () => GameState,
   dispatch: (command: GameCommand) => GameState,
-  deploymentVersion = fallbackDeploymentVersion
+  deploymentVersion = fallbackDeploymentVersion,
+  options: InstallDebugApiOptions = {}
 ): DefendDebugApi {
   const api: DefendDebugApi = {
     getState: () => getSerializableSnapshot(getState()),
@@ -182,10 +250,102 @@ export function installDebugApi(
       return getSerializableSnapshot(dispatch(command));
     }
   };
+  if (options.enableTestDriver) {
+    api.testDriver = createTestDriver(getState, dispatch, options.playerSlot ?? "p1");
+  }
 
   if (typeof window !== "undefined") {
     window.__DEFEND_DEBUG__ = api;
   }
 
   return api;
+}
+
+function createTestDriver(
+  getState: () => GameState,
+  dispatch: (command: GameCommand) => GameState,
+  playerSlot: PlayerId
+): DefendTestDriver {
+  let inputSeq = 0;
+  const keys = new Set<string>();
+  let aimTarget: Vec2 | null = null;
+  let fireHeld = false;
+
+  function sendInput(): GameStateSnapshot {
+    const hero = getState().heroes.find((candidate) => candidate.playerSlot === playerSlot);
+    inputSeq = Math.max(inputSeq, hero?.lastInputSeq ?? 0);
+    inputSeq += 1;
+    const payload = buildHeroInput(getState(), playerSlot, inputSeq, keys, aimTarget, fireHeld);
+    return getSerializableSnapshot(dispatch({ type: "hero_input", playerId: playerSlot, ...payload }));
+  }
+
+  return {
+    getPlayerSlot: () => playerSlot,
+    getLatestRoomState: () => getSerializableSnapshot(getState()),
+    getRenderedEntities: () => {
+      const description = describeGameState(getState());
+      return {
+        heroes: description.heroes,
+        heroProjectiles: description.heroProjectiles,
+        enemies: description.enemies,
+        towers: description.towers
+      };
+    },
+    pressKey: (key) => {
+      keys.add(normalizeKey(key));
+      return sendInput();
+    },
+    releaseKey: (key) => {
+      keys.delete(normalizeKey(key));
+      return sendInput();
+    },
+    aimAtWorld: (x, y) => {
+      aimTarget = { x, y };
+      return sendInput();
+    },
+    fireDown: () => {
+      fireHeld = true;
+      return sendInput();
+    },
+    fireUp: () => {
+      fireHeld = false;
+      return sendInput();
+    },
+    waitForTick: (tick) => {
+      let state = getState();
+      const boundedTarget = Math.max(state.tick, Math.floor(tick));
+      while (state.tick < boundedTarget) {
+        state = dispatch({ type: "simulation:step", ticks: Math.min(20, boundedTarget - state.tick) });
+      }
+      return getSerializableSnapshot(state);
+    },
+    getEventLog: () => [...getState().heroEvents]
+  };
+}
+
+function buildHeroInput(
+  state: GameState,
+  playerSlot: PlayerId,
+  inputSeq: number,
+  keys: Set<string>,
+  aimTarget: Vec2 | null,
+  fireHeld: boolean
+): HeroInputPayload {
+  const moveX = (keys.has("d") || keys.has("arrowright") ? 1 : 0) + (keys.has("a") || keys.has("arrowleft") ? -1 : 0);
+  const moveY = (keys.has("s") || keys.has("arrowdown") ? 1 : 0) + (keys.has("w") || keys.has("arrowup") ? -1 : 0);
+  const hero = state.heroes.find((candidate) => candidate.playerSlot === playerSlot);
+  const aimX = aimTarget && hero ? aimTarget.x - hero.x : (hero?.aimX ?? -1);
+  const aimY = aimTarget && hero ? aimTarget.y - hero.y : (hero?.aimY ?? 0);
+  return {
+    inputSeq,
+    moveX,
+    moveY,
+    aimX,
+    aimY,
+    fireHeld
+  };
+}
+
+function normalizeKey(key: string): string {
+  return key.trim().toLowerCase();
 }

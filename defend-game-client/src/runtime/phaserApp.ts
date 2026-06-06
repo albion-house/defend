@@ -7,7 +7,7 @@ import {
   type DefendDebugState
 } from "../game/debug";
 import { applyGameCommand, createInitialGameState } from "../game/state";
-import type { GameCommand, GameState } from "../game/state";
+import type { GameCommand, GameState, PlayerId } from "../game/state";
 import { MockSessionTransport } from "../net/transport";
 import { PrototypeScene, prototypeSceneSize } from "../scenes/PrototypeScene";
 
@@ -23,6 +23,7 @@ export interface MountDefendGameOptions {
   parent: string | HTMLElement;
   deploymentVersion?: string;
   sessionId?: string;
+  playerSlot?: PlayerId;
   onStateChange?: (state: DefendDebugState) => void;
 }
 
@@ -30,13 +31,14 @@ export function mountDefendGame({
   parent,
   deploymentVersion: deploymentVersionInput,
   sessionId = "local-mock",
+  playerSlot = "p1",
   onStateChange
 }: MountDefendGameOptions): DefendRuntime {
   const deploymentVersion = normalizeDeploymentVersion(deploymentVersionInput);
   const parentElement = resolveParent(parent);
   let gameState: GameState = createInitialGameState(sessionId);
   const transport = new MockSessionTransport(gameState.sessionId);
-  const scene = new PrototypeScene(() => gameState, dispatch);
+  const scene = new PrototypeScene(() => gameState, dispatch, playerSlot);
   let debugApi: DefendDebugApi;
 
   function dispatch(command: GameCommand): GameState {
@@ -64,7 +66,10 @@ export function mountDefendGame({
     parentElement.dispatchEvent(new CustomEvent<DefendDebugState>("defend:state-change", { detail: state }));
   }
 
-  debugApi = installDebugApi(() => gameState, dispatch, deploymentVersion);
+  debugApi = installDebugApi(() => gameState, dispatch, deploymentVersion, {
+    enableTestDriver: isTestDriverEnabled(deploymentVersion),
+    playerSlot
+  });
   void transport.connect();
 
   const game = new Phaser.Game({
@@ -97,6 +102,10 @@ export function mountDefendGame({
       }
     }
   };
+}
+
+function isTestDriverEnabled(deploymentVersion: string): boolean {
+  return deploymentVersion.includes("+local") || deploymentVersion.includes("+standalone") || deploymentVersion.includes("+test");
 }
 
 function resolveParent(parent: string | HTMLElement): HTMLElement {

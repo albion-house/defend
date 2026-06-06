@@ -8,6 +8,13 @@ export interface Vec2 {
   y: number;
 }
 
+export interface RectDefinition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface EnemyPathDefinition {
   id: PathId;
   label: string;
@@ -72,6 +79,12 @@ export interface MissionDefinition {
   startingGold: number;
   objectiveHp: number;
   fixedTickMs: number;
+  playableBounds: RectDefinition;
+  wallBlockers: Array<{
+    id: string;
+    label: string;
+    bounds: RectDefinition;
+  }>;
   paths: EnemyPathDefinition[];
   buildPads: BuildPadDefinition[];
   towers: TowerDefinition[];
@@ -86,6 +99,19 @@ export const firstPlayableMission: MissionDefinition = {
   startingGold: 320,
   objectiveHp: 20,
   fixedTickMs: 100,
+  playableBounds: { x: 52, y: 92, width: 854, height: 578 },
+  wallBlockers: [
+    {
+      id: "wall-north-marsh",
+      label: "North Marsh Wall",
+      bounds: { x: 330, y: 300, width: 140, height: 34 }
+    },
+    {
+      id: "wall-south-marsh",
+      label: "South Marsh Wall",
+      bounds: { x: 330, y: 386, width: 140, height: 34 }
+    }
+  ],
   paths: [
     {
       id: "A",

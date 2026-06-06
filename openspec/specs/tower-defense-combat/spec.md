@@ -2,7 +2,6 @@
 
 ## Purpose
 Define deterministic tower construction, targeting, blocker behavior, enemy damage, and reward flow for the first playable mission.
-
 ## Requirements
 ### Requirement: Buildable tower archetypes
 The system SHALL let the player build four original tower archetypes on fixed pads: a ranged tower, an artillery tower, a magic tower, and a blocker tower.
@@ -43,3 +42,21 @@ Enemies reduced to zero HP SHALL leave active simulation and grant deterministic
 #### Scenario: Enemy defeated by tower damage
 - **WHEN** tower attacks reduce an enemy's current HP to zero
 - **THEN** the enemy SHALL no longer count as active and shared gold SHALL increase by that enemy's reward
+
+### Requirement: Towers block hero movement
+Built towers SHALL expose authoritative collision footprints that block hero movement immediately after construction and stop blocking after removal.
+
+#### Scenario: Built tower becomes hero blocker
+- **WHEN** a tower build command is accepted
+- **THEN** the resulting tower SHALL expose a hero collision footprint
+- **AND** heroes SHALL NOT pass through the tower footprint
+
+### Requirement: Tower placement avoids active heroes
+The tower build command SHALL reject placement when the requested tower footprint overlaps an active hero.
+
+#### Scenario: Build command rejects hero overlap
+- **GIVEN** `hero:p1` overlaps a build pad or requested tower footprint
+- **WHEN** a tower build command targets that location
+- **THEN** the command SHALL be rejected
+- **AND** no tower SHALL be added at that location
+- **AND** the rejection SHALL be observable through state, feedback, or event log

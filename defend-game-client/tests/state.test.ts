@@ -120,6 +120,194 @@ describe("first playable mission state", () => {
     expect(state.objective.currentHp).toBeGreaterThan(0);
     expect(new Set(getMissionContent().waves.flatMap((wave) => wave.spawns.map((spawn) => spawn.enemyTypeId))).size).toBeGreaterThanOrEqual(5);
   });
+
+  it("creates one synchronized hero per player slot and only p1 is active initially", () => {
+    const state = createInitialGameState("heroes");
+
+    expect(state.heroes.map((hero) => hero.heroId)).toEqual(["hero:p1", "hero:p2"]);
+    expect(state.heroes.find((hero) => hero.playerSlot === "p1")).toMatchObject({
+      connected: true,
+      alive: true,
+      velocityX: 0,
+      velocityY: 0
+    });
+    expect(state.heroes.find((hero) => hero.playerSlot === "p2")?.connected).toBe(false);
+
+    const joined = applyGameCommand(state, { type: "player:set-ready", playerId: "p2", ready: true });
+    expect(joined.heroes.find((hero) => hero.playerSlot === "p2")?.connected).toBe(true);
+  });
+
+  it("moves heroes by normalized velocity and stops when input stops", () => {
+    let state = createInitialGameState("hero-move");
+    const startX = hero(state, "p1").x;
+
+    state = applyGameCommand(state, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 1,
+      moveY: 1,
+      aimX: 1,
+      aimY: 0,
+      fireHeld: false
+    });
+    expect(Math.hypot(hero(state, "p1").velocityX, hero(state, "p1").velocityY)).toBeLessThanOrEqual(hero(state, "p1").maxSpeed + 0.1);
+
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    expect(hero(state, "p1").x).toBeGreaterThan(startX);
+
+    state = applyGameCommand(state, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 2,
+      moveX: 0,
+      moveY: 0,
+      aimX: 1,
+      aimY: 0,
+      fireHeld: false
+    });
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    expect(hero(state, "p1").velocityX).toBe(0);
+    expect(hero(state, "p1").velocityY).toBe(0);
+  });
+
+  it("validates hero ownership and ignores out-of-order input", () => {
+    let state = applyGameCommand(createInitialGameState("hero-owner"), { type: "player:set-ready", playerId: "p2", ready: true });
+    const p2Start = hero(state, "p2").x;
+
+    state = applyGameCommand(state, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 1,
+      moveY: 0,
+      aimX: 1,
+      aimY: 0,
+      fireHeld: false
+    });
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    expect(hero(state, "p1").x).toBeGreaterThan(850);
+    expect(hero(state, "p2").x).toBe(p2Start);
+
+    const afterFirst = hero(state, "p1").lastInputSeq;
+    state = applyGameCommand(state, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: -1,
+      moveY: 0,
+      aimX: -1,
+      aimY: 0,
+      fireHeld: false
+    });
+    expect(hero(state, "p1").lastInputSeq).toBe(afterFirst);
+    expect(state.heroEvents[0].type).toBe("hero.input_rejected");
+  });
+
+  it("blocks heroes against towers, walls, and bounds while allowing sliding", () => {
+    let towerState = build(createInitialGameState("hero-collision"), "pad-2", "ranger-post");
+    towerState = withHero(towerState, "p1", { x: 350, y: 220 });
+    towerState = applyGameCommand(towerState, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 1,
+      moveY: 0,
+      aimX: 1,
+      aimY: 0,
+      fireHeld: false
+    });
+    towerState = applyGameCommand(towerState, { type: "simulation:step", ticks: 1 });
+    expect(hero(towerState, "p1").x).toBe(350);
+    expect(towerState.heroEvents.some((event) => event.type === "hero.collision_resolved" && event.blockerType === "tower")).toBe(true);
+
+    let slideState = withHero(build(createInitialGameState("hero-slide"), "pad-2", "ranger-post"), "p1", { x: 360, y: 200 });
+    slideState = applyGameCommand(slideState, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 1,
+      moveY: 1,
+      aimX: 1,
+      aimY: 0,
+      fireHeld: false
+    });
+    slideState = applyGameCommand(slideState, { type: "simulation:step", ticks: 1 });
+    expect(hero(slideState, "p1").x).toBe(360);
+    expect(hero(slideState, "p1").y).toBeGreaterThan(200);
+
+    let wallState = withHero(createInitialGameState("hero-wall"), "p1", { x: 400, y: 270 });
+    wallState = applyGameCommand(wallState, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 0,
+      moveY: 1,
+      aimX: 0,
+      aimY: 1,
+      fireHeld: false
+    });
+    wallState = applyGameCommand(wallState, { type: "simulation:step", ticks: 1 });
+    expect(hero(wallState, "p1").y).toBe(270);
+    expect(wallState.heroEvents.some((event) => event.type === "hero.collision_resolved" && event.blockerType === "wall")).toBe(true);
+
+    let boundsState = withHero(createInitialGameState("hero-bounds"), "p1", { x: 70, y: 350 });
+    boundsState = applyGameCommand(boundsState, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: -1,
+      moveY: 0,
+      aimX: -1,
+      aimY: 0,
+      fireHeld: false
+    });
+    boundsState = applyGameCommand(boundsState, { type: "simulation:step", ticks: 1 });
+    expect(hero(boundsState, "p1").x).toBe(70);
+    expect(boundsState.heroEvents.some((event) => event.type === "hero.collision_resolved" && event.blockerType === "bounds")).toBe(true);
+  });
+
+  it("rejects tower placement when an active hero overlaps the footprint", () => {
+    let state = createInitialGameState("hero-build-blocked");
+    state = withHero(state, "p1", { ...state.buildPads[0].position });
+    state = build(state, "pad-1", "ranger-post");
+
+    expect(state.towers).toHaveLength(0);
+    expect(state.buildPads[0].occupiedBy).toBeNull();
+    expect(state.heroEvents[0]).toMatchObject({
+      type: "hero.input_rejected",
+      reason: "tower-overlaps-hero"
+    });
+  });
+
+  it("spawns hero projectiles, enforces cooldown, and damages enemies without damaging towers", () => {
+    let state = applyGameCommand(createInitialGameState("hero-combat"), { type: "wave:start" });
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    state = withHero(state, "p1", { x: 150, y: 174 });
+    state = build(state, "pad-2", "ranger-post");
+
+    state = applyGameCommand(state, {
+      type: "hero_input",
+      playerId: "p1",
+      inputSeq: 1,
+      moveX: 0,
+      moveY: 0,
+      aimX: -1,
+      aimY: 0,
+      fireHeld: true
+    });
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    expect(state.heroProjectiles).toHaveLength(1);
+    expect(state.heroEvents.some((event) => event.type === "hero.fired")).toBe(true);
+
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 1 });
+    expect(state.heroEvents.some((event) => event.type === "hero.fire_rejected")).toBe(true);
+
+    state = applyGameCommand(state, { type: "simulation:step", ticks: 6 });
+    expect(state.heroEvents.some((event) => event.type === "hero.projectile_hit_enemy")).toBe(true);
+    expect(state.heroEvents.some((event) => event.type === "enemy.damaged")).toBe(true);
+    expect(state.towers[0]).toMatchObject({ typeId: "ranger-post", damageDealt: 0 });
+  });
 });
 
 function build(state: GameState, padId: string, towerTypeId: TowerTypeId): GameState {
@@ -136,4 +324,30 @@ function runOpening(state: GameState): GameState {
   next = build(next, "pad-7", "stoneward-lodge");
   next = build(next, "pad-4", "ranger-post");
   return completeWave(next);
+}
+
+function hero(state: GameState, playerId: "p1" | "p2") {
+  const found = state.heroes.find((candidate) => candidate.playerSlot === playerId);
+  if (!found) {
+    throw new Error(`Missing hero ${playerId}`);
+  }
+  return found;
+}
+
+function withHero(state: GameState, playerId: "p1" | "p2", position: { x: number; y: number }): GameState {
+  return {
+    ...state,
+    heroes: state.heroes.map((candidate) =>
+      candidate.playerSlot === playerId
+        ? {
+            ...candidate,
+            x: position.x,
+            y: position.y,
+            velocityX: 0,
+            velocityY: 0,
+            fireHeld: false
+          }
+        : candidate
+    )
+  };
 }
