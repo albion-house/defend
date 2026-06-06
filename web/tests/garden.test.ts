@@ -10,7 +10,7 @@ describe("knowledge garden", () => {
 
     expect(paths).toContain("index.md");
     expect(paths).toContain("dev/getting-started.md");
-    expect(paths).toContain("speculation/world-and-art.md");
+    expect(paths).toContain("design/concept/expedition mode.md");
   });
 
   it("keeps every document named and summarized", () => {

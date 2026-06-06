@@ -1,8 +1,5 @@
-# multiplayer-hero-navigation Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change add-hero-navigation-collision-enemy-targeting. Update Purpose after archive.
-## Requirements
 ### Requirement: Authoritative hero state
 The authoritative room or session state SHALL include one hero for each active player slot and SHALL expose the hero through serializable synchronized state.
 
@@ -210,3 +207,192 @@ The authoritative simulation SHALL reject tower placement when the requested tow
 - **THEN** the authoritative simulation SHALL reject the build command
 - **AND** `tower:t1` SHALL NOT be added to authoritative state
 
+### Requirement: Hero aim state
+The authoritative simulation SHALL track each hero aim direction and SHALL normalize or clamp aim input before using it for weapon fire.
+
+#### Scenario: Hero aim is synchronized
+- **GIVEN** `p1` controls `hero:p1`
+- **WHEN** `p1` aims at a world position or direction
+- **AND** the client sends `hero_input` containing `aimX` and `aimY`
+- **THEN** the authoritative state SHALL expose `hero:p1` aim direction
+- **AND** both clients SHALL observe the same aim direction or facing indicator
+
+### Requirement: Hero firing is authoritative
+A hero SHALL be able to request weapon fire with `fireHeld`, but the authoritative simulation SHALL decide whether a shot is fired.
+
+The authoritative simulation SHALL enforce weapon cooldown, normalize aim direction, originate shots from the authoritative hero position, and prevent clients from directly mutating enemy health.
+
+#### Scenario: Hero fires at enemy
+- **GIVEN** `p1` is connected
+- **AND** `hero:p1` is alive
+- **AND** `enemy:e1` is in the arena
+- **WHEN** `p1` aims at `enemy:e1`
+- **AND** `p1` sends `hero_input` with `fireHeld` `true`
+- **AND** the authoritative simulation advances
+- **THEN** the system SHALL emit `hero.fired`
+- **AND** a hero projectile or attack effect SHALL be created
+- **AND** `enemy:e1` SHALL take damage when hit
+- **AND** both clients SHALL observe the same enemy health
+
+#### Scenario: Weapon cooldown is authoritative
+- **GIVEN** `p1` has just fired `hero:p1` weapon
+- **WHEN** `p1` continues sending `hero_input` with `fireHeld` `true`
+- **AND** the authoritative simulation advances fewer ticks than the weapon cooldown
+- **THEN** the authoritative simulation SHALL NOT create another shot
+- **AND** the system SHALL emit `hero.fire_rejected`
+
+### Requirement: Hero projectile state
+V1 hero weapon behavior SHALL use synchronized projectile state unless a later accepted design explicitly chooses hitscan.
+
+Projectile state SHALL include:
+
+```ts
+HeroProjectileState {
+  projectileId: string
+  ownerHeroId: string
+  x: number
+  y: number
+  velocityX: number
+  velocityY: number
+  radius: number
+  damage: number
+  spawnTick: number
+  expiresAtTick: number
+}
+```
+
+#### Scenario: Projectile is spawned from authoritative hero
+- **GIVEN** `hero:p1` fires a valid shot
+- **WHEN** the authoritative simulation creates a projectile
+- **THEN** the projectile SHALL start at the authoritative `hero:p1` position
+- **AND** the projectile SHALL move in the normalized aim direction
+- **AND** both clients SHALL observe the same projectile state
+
+#### Scenario: Projectile expires
+- **GIVEN** a hero projectile has been spawned
+- **WHEN** the projectile reaches its expiration tick, configured range, or valid removal condition
+- **THEN** the authoritative simulation SHALL remove the projectile from synchronized state
+
+### Requirement: Hero projectiles damage enemies only
+Hero projectiles SHALL collide with enemies and SHALL NOT damage towers or walls.
+
+Enemy damage and death from hero projectiles SHALL be resolved server-side or authority-side. Both clients SHALL observe the same enemy health and death state.
+
+#### Scenario: Projectile damages enemy but not tower
+- **GIVEN** `p1` is connected
+- **AND** `enemy:e1` and `tower:t1` are in the projectile path
+- **WHEN** `p1` fires `hero:p1` weapon
+- **AND** the authoritative simulation advances
+- **THEN** enemy damage SHALL be resolved only for valid enemy hits
+- **AND** `tower:t1` health or state SHALL NOT be damaged by the hero projectile
+
+#### Scenario: Enemy killed by hero projectile
+- **GIVEN** `enemy:e1` has current HP less than or equal to `hero:p1` projectile damage
+- **WHEN** `hero:p1` projectile hits `enemy:e1`
+- **THEN** the authoritative simulation SHALL apply `enemy.damaged`
+- **AND** the authoritative simulation SHALL resolve `enemy.killed`
+- **AND** both clients SHALL observe that `enemy:e1` is no longer active
+
+#### Scenario: Projectile may expire on wall
+- **GIVEN** wall collision is implemented for projectiles
+- **WHEN** a hero projectile intersects `wall:w1`
+- **THEN** the projectile MAY expire
+- **AND** `wall:w1` SHALL NOT take damage from the hero projectile
+
+### Requirement: Hero observability events
+The authoritative simulation SHALL emit structured events for hero movement, collision, firing, projectile hits, and enemy damage so tests can verify behavior without relying only on screenshots.
+
+Required event types SHALL include:
+
+- `hero.input_received`
+- `hero.input_rejected`
+- `hero.velocity_updated`
+- `hero.moved`
+- `hero.collision_resolved`
+- `hero.fire_requested`
+- `hero.fired`
+- `hero.fire_rejected`
+- `hero.projectile_spawned`
+- `hero.projectile_hit_enemy`
+- `enemy.damaged`
+- `enemy.killed`
+
+Collision events SHALL include:
+
+```ts
+{
+  tick: number
+  type: "hero.collision_resolved"
+  heroId: string
+  blockerType: "tower" | "wall" | "bounds"
+  blockerId: string
+  attemptedPosition: { x: number, y: number }
+  resolvedPosition: { x: number, y: number }
+}
+```
+
+#### Scenario: Collision event is emitted
+- **GIVEN** `hero:p1` attempts to move into `tower:t1`
+- **WHEN** the authoritative simulation resolves the collision
+- **THEN** the event log SHALL include `hero.collision_resolved`
+- **AND** the event SHALL include tick, hero id, blocker type, blocker id, attempted position, and resolved position
+
+#### Scenario: Firing events are emitted
+- **GIVEN** `hero:p1` requests weapon fire
+- **WHEN** the authoritative simulation accepts or rejects the shot
+- **THEN** the event log SHALL include either `hero.fired` or `hero.fire_rejected`
+
+### Requirement: Headless hero simulation tests
+The test suite SHALL include deterministic headless simulation tests for hero movement, collision, ownership, shooting, and tower placement.
+
+#### Scenario: Headless tests cover hero rules
+- **WHEN** the headless simulation test suite runs
+- **THEN** it SHALL verify velocity integration, diagonal movement normalization, tower collision, wall collision, bounds collision, collision sliding, hero ownership validation, fire cooldown, projectile spawn, projectile enemy hit, enemy damage, and tower placement rejection when overlapping a hero
+
+### Requirement: Protocol-level multiplayer hero tests
+The test suite SHALL include tests where two network or protocol-shaped clients connect to the real multiplayer session surface and verify synchronized hero behavior.
+
+#### Scenario: Two protocol clients control owned heroes
+- **GIVEN** two protocol clients are connected to the same session
+- **WHEN** `p1` and `p2` send hero input
+- **THEN** `p1` SHALL control only `hero:p1`
+- **AND** `p2` SHALL control only `hero:p2`
+
+#### Scenario: Protocol clients receive synchronized hero state
+- **GIVEN** two protocol clients are connected to the same session
+- **WHEN** `p1` moves around a tower, `p2` moves along a wall, and `p1` fires at an enemy
+- **THEN** both clients SHALL receive the same hero positions, projectile state, and enemy damage state
+
+### Requirement: Browser hero test driver
+The browser test surface SHALL expose a test-only Defend driver that can drive hero movement, aiming, firing, tick waiting, and event inspection without relying only on screenshots.
+
+The driver SHALL expose these operations through the Defend debug/test surface:
+
+- `getPlayerSlot()`
+- `getLatestRoomState()`
+- `getRenderedEntities()`
+- `pressKey(key)`
+- `releaseKey(key)`
+- `aimAtWorld(x, y)`
+- `fireDown()`
+- `fireUp()`
+- `waitForTick(tick)`
+- `getEventLog()`
+
+#### Scenario: Browser driver sends hero input
+- **GIVEN** the prototype is running in a browser test
+- **WHEN** the test driver presses `W`, `A`, `S`, or `D`
+- **THEN** the client SHALL send `hero_input`
+- **AND** the authoritative state SHALL update through the same input path used by interactive play
+
+#### Scenario: Browser driver verifies rendered hero movement
+- **GIVEN** the prototype is running in a browser test
+- **WHEN** the driver moves a hero, aims at an enemy, and fires
+- **THEN** rendered entities SHALL show hero movement and a visible projectile or firing effect
+- **AND** synchronized state SHALL expose observable enemy damage when a valid hit resolves
+
+#### Scenario: Browser driver verifies blockers
+- **GIVEN** the prototype is running in a browser test
+- **WHEN** the driver moves a hero into a tower and a wall
+- **THEN** rendered hero entities SHALL stop at the blockers
+- **AND** the event log SHALL include `hero.collision_resolved`

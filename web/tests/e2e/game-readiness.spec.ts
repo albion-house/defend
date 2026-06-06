@@ -86,7 +86,11 @@ test("knowledge garden and play route render canonical surfaces", async ({ page,
     { path: "/garden/dev/getting-started/", heading: "getting started", text: "mise //web:dev" },
     { path: "/garden/design/first-playable/", heading: "first playable", text: "saltmarsh crossing" },
     { path: "/garden/reference/glossary/", heading: "glossary", text: "simulation command" },
-    { path: "/garden/speculation/world-and-art/", heading: "world and art sketches", text: "none of this is promised" },
+    {
+      path: "/garden/design/concept/expedition%20mode/",
+      heading: "expedition mode",
+      text: "co-op action-adventure mode"
+    },
     { path: "/play/", heading: "play", text: "version" }
   ];
 

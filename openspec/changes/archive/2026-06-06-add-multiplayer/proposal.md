@@ -22,9 +22,7 @@ This is the next step toward the playable co-op loop because the prototype alrea
 
 ### New Capabilities
 
-- `multiplayer-hero-navigation`: Authoritative hero state, ownership, movement input, velocity integration, bounds enforcement, and deterministic collision against towers, walls, and map blockers.
-- `multiplayer-hero-combat`: Hero aim, firing, cooldowns, projectile state, enemy-only damage, and synchronized enemy health/death resolution.
-- `multiplayer-hero-validation`: Structured observability, protocol-level multiplayer checks, and browser driver coverage for hero movement, collision, shooting, and synchronization.
+- `multiplayer`: Authoritative hero state, ownership, movement input, velocity integration, collision, hero aim and combat, synchronized enemy damage, structured observability, protocol checks, and browser driver coverage for active cooperative play.
 
 ### Modified Capabilities
 

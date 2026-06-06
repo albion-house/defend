@@ -64,5 +64,5 @@
 - [x] 8.1 Run the relevant game-client unit/headless test suite.
 - [x] 8.2 Run the relevant web/browser integration test suite.
 - [x] 8.3 Run typecheck and build for the affected workspace packages.
-- [x] 8.4 Run `openspec validate --changes add-hero-navigation-collision-enemy-targeting --strict`.
+- [x] 8.4 Run OpenSpec strict validation for the multiplayer change.
 - [x] 8.5 Run `git diff --check`.
