@@ -153,3 +153,12 @@ Build and test tools that are imported in-process by project configuration or te
 - **WHEN** a project-coupled build or test tool is invoked through a task
 - **THEN** the version used SHALL be the one resolved from the workspace dependency lockfile
 - **AND** the repository SHALL NOT introduce a second, independently pinned global version of that same tool
+
+### Requirement: Sandbox-safe mise invocation
+The repository SHALL provide a documented wrapper for sandboxed agent environments that sets `MISE_CACHE_DIR` to a writable temporary directory before invoking commands that may use mise or mise-managed shims.
+
+#### Scenario: Agent runs mise in a restricted sandbox
+- **GIVEN** an agent sandbox cannot write to the user's home cache directory
+- **WHEN** the agent runs a mise-backed command through the documented sandbox wrapper
+- **THEN** mise SHALL use a writable temporary cache directory
+- **AND** the command output SHALL NOT be polluted by repeated home-cache write warnings

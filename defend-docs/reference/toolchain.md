@@ -12,6 +12,8 @@ aube is the package manager only. it installs dependencies (`mise //:install`, o
 
 standalone CLIs that are not imported in-process (for example OpenSpec) are registered in `mise.toml` `[tools]` via the npm backend.
 
+the repo includes `dev/sandbox` for sandboxed agents. it sets `MISE_CACHE_DIR` to a writable temp directory before invoking a command, which prevents mise-managed shims from trying to write `~/Library/Caches/mise` when the sandbox cannot write user-home cache files.
+
 node follows the stable line in `mise.toml`.
 
 python is not part of this repo right now.
