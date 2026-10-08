@@ -4,7 +4,7 @@ min_version = "2026.5.3"
 # Monorepo mode: each workspace (see [monorepo].config_roots) owns its own
 # file-based tasks, addressed as //<workspace>:<task>. Root-level tasks live in
 # ./mise-tasks and are addressed as //:<task>. No npm scripts are used anywhere.
-experimental_monorepo_root = true
+monorepo_root = true
 
 [settings]
 experimental = true
